@@ -1,0 +1,33 @@
+[
+  {
+  "name" : "Cooler",
+  "price" : 180000,
+  "quantity": 100,
+  "description": "This is Product 1",
+  "image": "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png",
+  "category_id": "f014cec2e4f811eda9fb0242ac130002"
+  },
+  {
+  "name" : "Flashdisk 64GB",
+  "price" : 78000,
+  "quantity": 1000,
+  "description": "This is Product ",
+  "image": "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png",
+  "category_id": "f014cec2e4f811eda9fb0242ac130002"
+},
+  {
+  "name" : "Monitor Asus",
+  "price" : 2000000,
+  "quantity": 150,
+  "description": "This is Product 3",
+  "image": "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png",
+  "category_id": "f014cec2e4f811eda9fb0242ac130002"
+},
+{
+  "name" : "Mouse Logitech",
+  "price" : 250000,
+  "quantity": 1300,
+  "description": "This is Product 4",
+  "category_id": "f014cec2e4f811eda9fb0242ac130002"
+}
+]
