@@ -42,6 +42,8 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 	}
 
 	productResult := service.ProductRepo.Save(ctx, tx, product)
+	productResult, err = service.ProductRepo.FindId(ctx, tx, productResult.ProductId)
+	helper.PanicIfError(err)
 
 	return helper.ToProductResponse(productResult)
 }

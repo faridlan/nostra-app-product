@@ -63,6 +63,27 @@ func (repository *ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 	}
 }
 
+func (repository *ProductRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx, productId int) (domain.Product, error) {
+	SQL := `SELECT REPLACE(BIN_TO_UUID(product_id), '-', ''), name, price, quantity, description, image, REPLACE(BIN_TO_UUID(category_id), '-', ''), 
+	created_at, updated_at FROM products WHERE id = ?`
+
+	rows, err := tx.QueryContext(ctx, SQL, productId)
+	helper.PanicIfError(err)
+
+	defer rows.Close()
+
+	product := domain.Product{}
+
+	if rows.Next() {
+		err := rows.Scan(&product.Id, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.CategoryId, &product.CreatedAt, &product.UpdatedAt)
+		helper.PanicIfError(err)
+
+		return product, nil
+	} else {
+		return product, errors.New("product not found")
+	}
+}
+
 func (repository *ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Product {
 	SQL := `SELECT REPLACE(BIN_TO_UUID(product_id), '-', ''), name, price, quantity, description, image, REPLACE(BIN_TO_UUID(category_id), '-', ''), 
 	created_at, updated_at FROM products`
