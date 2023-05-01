@@ -1,6 +1,6 @@
 [
   {
-  "name" : "Cooler",
+  "name" : "Product 1",
   "price" : 180000,
   "quantity": 100,
   "description": "This is Product 1",
@@ -8,26 +8,18 @@
   "category_id": "f014cec2e4f811eda9fb0242ac130002"
   },
   {
-  "name" : "Flashdisk 64GB",
+  "name" : "Product 2",
   "price" : 78000,
   "quantity": 1000,
-  "description": "This is Product ",
+  "description": "This is Product 2",
   "image": "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png",
-  "category_id": "f014cec2e4f811eda9fb0242ac130002"
-},
-  {
-  "name" : "Monitor Asus",
-  "price" : 2000000,
-  "quantity": 150,
-  "description": "This is Product 3",
-  "image": "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png",
-  "category_id": "f014cec2e4f811eda9fb0242ac130002"
+  "category_id": "209b72afe82c11eda20f0242ac130002"
 },
 {
-  "name" : "Mouse Logitech",
+  "name" : "Product 3",
   "price" : 250000,
   "quantity": 1300,
-  "description": "This is Product 4",
-  "category_id": "f014cec2e4f811eda9fb0242ac130002"
+  "description": "This is Product 3",
+  "category_id": "209bac8ae82c11eda20f0242ac130002"
 }
 ]

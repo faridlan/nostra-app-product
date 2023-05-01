@@ -30,3 +30,22 @@ func ToProductResponses(products []domain.Product) []web.ProductResponse {
 
 	return productResponses
 }
+
+func ToCategoryResponse(category domain.Category) web.CategoryResponse {
+	return web.CategoryResponse{
+		Id:        category.Id,
+		Name:      category.Name,
+		CreatedAt: category.CreatedAt,
+		UpdatedAt: category.UpdatedAt,
+	}
+}
+
+func ToCategoryResponses(categories []domain.Category) []web.CategoryResponse {
+	cateogryResponses := []web.CategoryResponse{}
+
+	for _, category := range categories {
+		cateogryResponses = append(cateogryResponses, ToCategoryResponse(category))
+	}
+
+	return cateogryResponses
+}

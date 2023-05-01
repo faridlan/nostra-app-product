@@ -32,6 +32,14 @@ func main() {
 	router.POST("/api/products/seeder", productController.SeederCreate)
 	router.DELETE("/api/products/seeder", productController.SeederDelete)
 
+	categoryRepository := repository.NewCategoryRepository()
+	categoryService := service.NewCategoryService(categoryRepository, db)
+	categoryController := controller.NewCategoryController(categoryService)
+
+	//Seeder
+	router.POST("/api/categories/seeder", categoryController.SeederCreate)
+	router.DELETE("/api/categories/seeder", categoryController.SeederDelete)
+
 	server := http.Server{
 		Addr:    "localhost:8080",
 		Handler: router,
