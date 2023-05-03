@@ -14,9 +14,12 @@ func ToProductResponse(product domain.Product) web.ProductResponse {
 		Quantity:    product.Quantity,
 		Description: product.Description,
 		Image:       product.Image,
-		CategoryId:  product.CategoryId,
-		CreatedAt:   product.CreatedAt,
-		UpdatedAt:   product.UpdatedAt,
+		Category: &web.CategoryResponse{
+			Id:   product.Category.Id,
+			Name: product.Category.Name,
+		},
+		CreatedAt: product.CreatedAt,
+		UpdatedAt: product.UpdatedAt,
 	}
 
 }

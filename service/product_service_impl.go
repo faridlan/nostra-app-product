@@ -37,8 +37,10 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 		Quantity:    request.Quantity,
 		Description: request.Description,
 		Image:       imageString,
-		CategoryId:  request.CategoryId,
-		CreatedAt:   time.Now().UnixMilli(),
+		Category: domain.Category{
+			Id: request.Id,
+		},
+		CreatedAt: time.Now().UnixMilli(),
 	}
 
 	productResult := service.ProductRepo.Save(ctx, tx, product)
@@ -64,7 +66,7 @@ func (service *ProductServiceImpl) Update(ctx context.Context, request web.Produ
 	product.Quantity = request.Quantity
 	product.Description = request.Description
 	product.Image = imageString
-	product.CategoryId = request.CategoryId
+	product.Category.Id = request.CategoryId
 	product.UpdatedAt = upddateInt
 
 	productResult := service.ProductRepo.Update(ctx, tx, product)
@@ -121,7 +123,7 @@ func (service *ProductServiceImpl) CreateMany(ctx context.Context, request []web
 		product.Quantity = req.Quantity
 		product.Description = req.Description
 		product.Image = imageString
-		product.CategoryId = req.CategoryId
+		product.Category.Id = req.CategoryId
 		product.CreatedAt = time.Now().UnixMilli()
 
 		products = append(products, product)

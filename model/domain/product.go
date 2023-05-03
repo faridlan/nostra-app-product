@@ -12,7 +12,7 @@ type Product struct {
 	Quantity    int
 	Description string
 	Image       *mysql.NullString
-	CategoryId  string
+	Category    Category
 	CreatedAt   int64
 	UpdatedAt   *mysql.NullInt
 }

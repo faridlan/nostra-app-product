@@ -3,8 +3,8 @@ package web
 import "github.com/faridlan/nostra-api-product/helper/mysql"
 
 type CategoryResponse struct {
-	Id        string
-	Name      string
-	CreatedAt int64
-	UpdatedAt *mysql.NullInt
+	Id        string         `json:"id,omitempty"`
+	Name      string         `json:"name,omitempty"`
+	CreatedAt int64          `json:"created_at,omitempty"`
+	UpdatedAt *mysql.NullInt `json:"updated_at,omitempty"`
 }

@@ -9,7 +9,7 @@ type ProductResponse struct {
 	Quantity    int               `json:"quantity,omitempty"`
 	Description string            `json:"description,omitempty"`
 	Image       *mysql.NullString `json:"image"`
-	CategoryId  string            `json:"category_id,omitempty"`
+	Category    *CategoryResponse `json:"category,omitempty"`
 	CreatedAt   int64             `json:"created_at,omitempty"`
 	UpdatedAt   *mysql.NullInt    `json:"updated_at"`
 }
