@@ -38,7 +38,7 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 		Description: request.Description,
 		Image:       imageString,
 		Category: domain.Category{
-			Id: request.Id,
+			Id: request.CategoryId,
 		},
 		CreatedAt: time.Now().UnixMilli(),
 	}
@@ -130,8 +130,9 @@ func (service *ProductServiceImpl) CreateMany(ctx context.Context, request []web
 	}
 
 	service.ProductRepo.SaveMany(ctx, tx, products)
+	productResponses := service.ProductRepo.FindAll(ctx, tx)
 
-	return helper.ToProductResponses(products)
+	return helper.ToProductResponses(productResponses)
 }
 
 func (service *ProductServiceImpl) DeleteAll(ctx context.Context) {
