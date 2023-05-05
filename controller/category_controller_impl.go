@@ -26,23 +26,76 @@ func NewCategoryController(categoryService service.CategoryService) CategoryCont
 }
 
 func (controller *CategoryControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	panic("not implemented") // TODO: Implement
+	categoryCreateReq := web.CategoryCreateReq{}
+	helper.ReadFromRequestBody(request, &categoryCreateReq)
+
+	category := controller.CategoryService.Create(request.Context(), categoryCreateReq)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   category,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (controller *CategoryControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	panic("not implemented") // TODO: Implement
+	categoryUpdateReq := web.CategoryUpdateReq{}
+	helper.ReadFromRequestBody(request, &categoryUpdateReq)
+	id := params.ByName("categoryId")
+
+	categoryUpdateReq.Id = id
+
+	category := controller.CategoryService.Update(request.Context(), categoryUpdateReq)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   category,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (controller *CategoryControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	panic("not implemented") // TODO: Implement
+	id := params.ByName("categoryId")
+
+	controller.CategoryService.Delete(request.Context(), id)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (controller *CategoryControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	panic("not implemented") // TODO: Implement
+	id := params.ByName("categoryId")
+
+	category := controller.CategoryService.FindById(request.Context(), id)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   category,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (controller *CategoryControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	panic("not implemented") // TODO: Implement
+
+	categories := controller.CategoryService.FindAll(request.Context())
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   categories,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (controller *CategoryControllerImpl) SeederCreate(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
