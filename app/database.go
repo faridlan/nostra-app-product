@@ -14,8 +14,9 @@ func NewDatabase() *sql.DB {
 	port := helper.GetEnvWithKey("PORT_DB")
 	host := helper.GetEnvWithKey("HOST_DB")
 	name := helper.GetEnvWithKey("NAME_DB")
+	pass := helper.GetEnvWithKey("PASS_DB")
 
-	db, err := sql.Open("mysql", fmt.Sprintf("root:root@tcp(%s:%s)/%s", host, port, name))
+	db, err := sql.Open("mysql", fmt.Sprintf("root:%s@tcp(%s:%s)/%s", pass, host, port, name))
 	helper.PanicIfError(err)
 
 	db.SetConnMaxIdleTime(time.Minute * 10)
