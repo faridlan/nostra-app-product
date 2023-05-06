@@ -17,11 +17,13 @@ var Json embed.FS
 
 type ProductControllerImpl struct {
 	ProductService service.ProductService
+	UploadService  service.UploadS3AWS
 }
 
-func NewProductController(productService service.ProductService) ProductController {
+func NewProductController(productService service.ProductService, uploadService service.UploadS3AWS) ProductController {
 	return &ProductControllerImpl{
 		ProductService: productService,
+		UploadService:  uploadService,
 	}
 }
 
@@ -121,6 +123,25 @@ func (controller *ProductControllerImpl) SeederDelete(writer http.ResponseWriter
 	webResponse := web.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *ProductControllerImpl) UploadImage(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	err := request.ParseMultipartForm(10 << 20)
+	helper.PanicIfError(err)
+
+	file, _, err := request.FormFile("imageProduct")
+	helper.PanicIfError(err)
+
+	defer file.Close()
+
+	upload := controller.UploadService.Upload(file, "products")
+	webResponse := web.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   upload,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

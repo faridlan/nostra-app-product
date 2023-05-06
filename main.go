@@ -17,9 +17,12 @@ func main() {
 	router := httprouter.New()
 	db := app.NewDatabase()
 
+	//Upload
+	upload := service.NewUploadS3AWS()
+
 	productRepository := repository.NewProductRepository()
 	productService := service.NewProductService(productRepository, db)
-	productController := controller.NewProductController(productService)
+	productController := controller.NewProductController(productService, upload)
 
 	//CRUD
 	router.POST("/api/products", productController.Create)
@@ -27,6 +30,7 @@ func main() {
 	// router.DELETE("/api/products/:productId", productController.Delete)
 	router.GET("/api/products/:productId", productController.FindById)
 	router.GET("/api/products", productController.FindAll)
+	router.POST("/api/products/image", productController.UploadImage)
 
 	//Seeder
 	router.POST("/api/products/seeder", productController.SeederCreate)
