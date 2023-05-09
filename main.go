@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/app"
@@ -20,6 +21,22 @@ func main() {
 	//Upload
 	upload := service.NewUploadS3AWS()
 
+	//User
+	userRepository := repository.NewUserRepository()
+	userService := service.NewAuthService(userRepository, db)
+	userController := controller.NewAuthController(userService, upload)
+
+	//User Seeder
+	router.POST("/api/users/seeder", userController.CreateMany)
+	router.DELETE("/api/users/seeder", userController.DeleteAll)
+
+	//User CRUD
+	router.POST("/api/users", userController.Register)
+	router.PUT("/api/users/:userId", userController.Update)
+	router.GET("/api/users/:userId", userController.FindById)
+	router.GET("/api/users", userController.FindAll)
+
+	//Product
 	productRepository := repository.NewProductRepository()
 	productService := service.NewProductService(productRepository, db)
 	productController := controller.NewProductController(productService, upload)
@@ -32,10 +49,11 @@ func main() {
 	router.GET("/api/products", productController.FindAll)
 	router.POST("/api/products/image", productController.UploadImage)
 
-	//Seeder
+	//Product Seeder
 	router.POST("/api/products/seeder", productController.SeederCreate)
 	router.DELETE("/api/products/seeder", productController.SeederDelete)
 
+	//Category
 	categoryRepository := repository.NewCategoryRepository()
 	categoryService := service.NewCategoryService(categoryRepository, db)
 	categoryController := controller.NewCategoryController(categoryService)
@@ -47,7 +65,7 @@ func main() {
 	router.GET("/api/categories/:categoryId", categoryController.FindById)
 	router.GET("/api/categories", categoryController.FindAll)
 
-	//Seeder
+	//Category Seeder
 	router.POST("/api/categories/seeder", categoryController.SeederCreate)
 	router.DELETE("/api/categories/seeder", categoryController.SeederDelete)
 
@@ -56,6 +74,7 @@ func main() {
 		Handler: router,
 	}
 
+	fmt.Println("server running at Port 8080")
 	err := server.ListenAndServe()
 	helper.PanicIfError(err)
 }
