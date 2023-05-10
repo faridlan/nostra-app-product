@@ -36,6 +36,21 @@ func main() {
 	router.GET("/api/users/:userId", userController.FindById)
 	router.GET("/api/users", userController.FindAll)
 
+	//Role
+	roleRepository := repository.NewRoleRepository()
+	roleService := service.NewRoleService(roleRepository, db)
+	roleController := controller.NewRoleController(roleService)
+
+	//Seeder
+	router.POST("/api/roles/seeder", roleController.SeederCreate)
+	router.DELETE("/api/roles/seeder", roleController.SeederDelete)
+
+	//CRUS
+	router.GET("/api/roles", roleController.FindAll)
+	router.GET("/api/roles/:roleId", roleController.FindById)
+	router.POST("/api/roles", roleController.Create)
+	router.PUT("/api/roles/:roleId", roleController.Update)
+
 	//Product
 	productRepository := repository.NewProductRepository()
 	productService := service.NewProductService(productRepository, db)
