@@ -6,6 +6,7 @@ import (
 
 	"github.com/faridlan/nostra-api-product/app"
 	"github.com/faridlan/nostra-api-product/controller"
+	"github.com/faridlan/nostra-api-product/exception"
 	"github.com/faridlan/nostra-api-product/helper"
 	"github.com/faridlan/nostra-api-product/repository"
 	"github.com/faridlan/nostra-api-product/service"
@@ -83,6 +84,8 @@ func main() {
 	//Category Seeder
 	router.POST("/api/categories/seeder", categoryController.SeederCreate)
 	router.DELETE("/api/categories/seeder", categoryController.SeederDelete)
+
+	router.PanicHandler = exception.ExceptionError
 
 	server := http.Server{
 		Addr:    "localhost:8080",
