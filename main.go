@@ -10,6 +10,7 @@ import (
 	"github.com/faridlan/nostra-api-product/helper"
 	"github.com/faridlan/nostra-api-product/repository"
 	"github.com/faridlan/nostra-api-product/service"
+	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
 )
@@ -18,6 +19,7 @@ func main() {
 
 	router := httprouter.New()
 	db := app.NewDatabase()
+	validate := validator.New()
 
 	//Upload
 	upload := service.NewUploadS3AWS()
@@ -39,7 +41,7 @@ func main() {
 
 	//Role
 	roleRepository := repository.NewRoleRepository()
-	roleService := service.NewRoleService(roleRepository, db)
+	roleService := service.NewRoleService(roleRepository, db, validate)
 	roleController := controller.NewRoleController(roleService)
 
 	//Seeder
@@ -54,7 +56,7 @@ func main() {
 
 	//Product
 	productRepository := repository.NewProductRepository()
-	productService := service.NewProductService(productRepository, db)
+	productService := service.NewProductService(productRepository, db, validate)
 	productController := controller.NewProductController(productService, upload)
 
 	//CRUD

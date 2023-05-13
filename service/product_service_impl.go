@@ -5,22 +5,26 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/faridlan/nostra-api-product/exception"
 	"github.com/faridlan/nostra-api-product/helper"
 	"github.com/faridlan/nostra-api-product/helper/mysql"
 	"github.com/faridlan/nostra-api-product/model/domain"
 	"github.com/faridlan/nostra-api-product/model/web"
 	"github.com/faridlan/nostra-api-product/repository"
+	"github.com/go-playground/validator/v10"
 )
 
 type ProductServiceImpl struct {
 	ProductRepo repository.ProductRepository
 	DB          *sql.DB
+	Validate    *validator.Validate
 }
 
-func NewProductService(productRepo repository.ProductRepository, db *sql.DB) ProductService {
+func NewProductService(productRepo repository.ProductRepository, db *sql.DB, validate *validator.Validate) ProductService {
 	return &ProductServiceImpl{
 		ProductRepo: productRepo,
 		DB:          db,
+		Validate:    validate,
 	}
 }
 
@@ -28,6 +32,12 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
+
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
 
 	imageString := mysql.NewNullString(request.Image)
 
@@ -55,11 +65,19 @@ func (service *ProductServiceImpl) Update(ctx context.Context, request web.Produ
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
+
 	imageString := mysql.NewNullString(request.Image)
 	upddateInt := mysql.NewNullInt64(time.Now().UnixMilli())
 
 	product, err := service.ProductRepo.FindById(ctx, tx, request.Id)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	product.Name = request.Name
 	product.Price = request.Price
@@ -80,7 +98,9 @@ func (service *ProductServiceImpl) Delete(ctx context.Context, productId string)
 	defer helper.CommitOrRollback(tx)
 
 	product, err := service.ProductRepo.FindById(ctx, tx, productId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	service.ProductRepo.Delete(ctx, tx, product)
 }
@@ -91,7 +111,9 @@ func (service *ProductServiceImpl) FindById(ctx context.Context, productId strin
 	defer helper.CommitOrRollback(tx)
 
 	product, err := service.ProductRepo.FindById(ctx, tx, productId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	return helper.ToProductResponse(product)
 }

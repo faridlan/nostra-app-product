@@ -5,22 +5,26 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/faridlan/nostra-api-product/exception"
 	"github.com/faridlan/nostra-api-product/helper"
 	"github.com/faridlan/nostra-api-product/helper/mysql"
 	"github.com/faridlan/nostra-api-product/model/domain"
 	"github.com/faridlan/nostra-api-product/model/web"
 	"github.com/faridlan/nostra-api-product/repository"
+	"github.com/go-playground/validator/v10"
 )
 
 type RoleServiceImpl struct {
 	RoleRepo repository.RoleRepository
 	DB       *sql.DB
+	Validate *validator.Validate
 }
 
-func NewRoleService(roleRepo repository.RoleRepository, db *sql.DB) RoleService {
+func NewRoleService(roleRepo repository.RoleRepository, db *sql.DB, validate *validator.Validate) RoleService {
 	return &RoleServiceImpl{
 		RoleRepo: roleRepo,
 		DB:       db,
+		Validate: validate,
 	}
 }
 
@@ -28,6 +32,13 @@ func (service *RoleServiceImpl) Create(ctx context.Context, request web.RoleCrea
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
+
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
+
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
 
 	role := domain.Role{
 		Name:      request.Name,
@@ -44,9 +55,17 @@ func (service *RoleServiceImpl) Update(ctx context.Context, request web.RoleUpda
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	role, err := service.RoleRepo.FindById(ctx, tx, request.Id)
-	helper.PanicIfError(err)
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
 
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
+
+	role, err := service.RoleRepo.FindById(ctx, tx, request.Id)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 	roleUpdate := mysql.NewNullInt64(time.Now().UnixMilli())
 
 	role.Name = request.Name
@@ -63,7 +82,9 @@ func (service *RoleServiceImpl) FindById(ctx context.Context, roleId string) web
 	defer helper.CommitOrRollback(tx)
 
 	role, err := service.RoleRepo.FindById(ctx, tx, roleId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	return helper.ToRoleResponse(role)
 }
