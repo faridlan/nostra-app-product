@@ -5,22 +5,26 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/faridlan/nostra-api-product/exception"
 	"github.com/faridlan/nostra-api-product/helper"
 	"github.com/faridlan/nostra-api-product/helper/mysql"
 	"github.com/faridlan/nostra-api-product/model/domain"
 	"github.com/faridlan/nostra-api-product/model/web"
 	"github.com/faridlan/nostra-api-product/repository"
+	"github.com/go-playground/validator/v10"
 )
 
 type CategoryServiceImpl struct {
 	CategoryRepo repository.CategoryRepository
 	DB           *sql.DB
+	Validate     *validator.Validate
 }
 
-func NewCategoryService(categoryRepo repository.CategoryRepository, db *sql.DB) CategoryService {
+func NewCategoryService(categoryRepo repository.CategoryRepository, db *sql.DB, validate *validator.Validate) CategoryService {
 	return &CategoryServiceImpl{
 		CategoryRepo: categoryRepo,
 		DB:           db,
+		Validate:     validate,
 	}
 }
 
@@ -28,6 +32,12 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request web.Cate
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
+
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
 
 	cateogry := domain.Category{
 		Name:      request.Name,
@@ -47,10 +57,18 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request web.Cate
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
+
 	updateAt := mysql.NewNullInt64(time.Now().UnixMilli())
 
 	category, err := service.CategoryRepo.FindById(ctx, tx, request.Id)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	category.Name = request.Name
 	category.UpdatedAt = updateAt
@@ -91,7 +109,9 @@ func (service *CategoryServiceImpl) FindAll(ctx context.Context) []web.CategoryR
 	defer helper.CommitOrRollback(tx)
 
 	categories := service.CategoryRepo.FindAll(ctx, tx)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	return helper.ToCategoryResponses(categories)
 }

@@ -5,22 +5,26 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/faridlan/nostra-api-product/exception"
 	"github.com/faridlan/nostra-api-product/helper"
 	"github.com/faridlan/nostra-api-product/helper/mysql"
 	"github.com/faridlan/nostra-api-product/model/domain"
 	"github.com/faridlan/nostra-api-product/model/web"
 	"github.com/faridlan/nostra-api-product/repository"
+	"github.com/go-playground/validator/v10"
 )
 
 type AuthServiceImpl struct {
 	UserRepo repository.UserRepository
 	DB       *sql.DB
+	Validate *validator.Validate
 }
 
-func NewAuthService(userRepo repository.UserRepository, db *sql.DB) AuthService {
+func NewAuthService(userRepo repository.UserRepository, db *sql.DB, validate *validator.Validate) AuthService {
 	return &AuthServiceImpl{
 		UserRepo: userRepo,
 		DB:       db,
+		Validate: validate,
 	}
 }
 
@@ -28,6 +32,12 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
+
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
 
 	imageString := mysql.NewNullString(request.Image)
 	user := domain.User{
@@ -52,8 +62,16 @@ func (service *AuthServiceImpl) Update(ctx context.Context, request web.UserUpda
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
+
 	user, err := service.UserRepo.FindById(ctx, tx, request.Id)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	imageString := mysql.NewNullString(request.Image)
 	updateInt := mysql.NewNullInt64(time.Now().UnixMilli())
@@ -75,7 +93,9 @@ func (service *AuthServiceImpl) FindById(ctx context.Context, userId string) web
 	defer helper.CommitOrRollback(tx)
 
 	user, err := service.UserRepo.FindById(ctx, tx, userId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	return helper.ToUserResponse(user)
 }

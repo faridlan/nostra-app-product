@@ -26,7 +26,7 @@ func main() {
 
 	//User
 	userRepository := repository.NewUserRepository()
-	userService := service.NewAuthService(userRepository, db)
+	userService := service.NewAuthService(userRepository, db, validate)
 	userController := controller.NewAuthController(userService, upload)
 
 	//User Seeder
@@ -73,7 +73,7 @@ func main() {
 
 	//Category
 	categoryRepository := repository.NewCategoryRepository()
-	categoryService := service.NewCategoryService(categoryRepository, db)
+	categoryService := service.NewCategoryService(categoryRepository, db, validate)
 	categoryController := controller.NewCategoryController(categoryService)
 
 	//CRUD
