@@ -129,12 +129,7 @@ func (controller *ProductControllerImpl) SeederDelete(writer http.ResponseWriter
 }
 
 func (controller *ProductControllerImpl) UploadImage(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	err := request.ParseMultipartForm(10 << 20)
-	helper.PanicIfError(err)
-
-	file, _, err := request.FormFile("imageProduct")
-	helper.PanicIfError(err)
-
+	file := helper.MultipartForm("productImage", request)
 	defer file.Close()
 
 	upload := controller.UploadService.Upload(file, "products")
