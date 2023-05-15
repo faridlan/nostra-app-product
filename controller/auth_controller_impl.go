@@ -111,3 +111,18 @@ func (controller *AuthControllerImpl) DeleteAll(writer http.ResponseWriter, requ
 	helper.WriteToResponseBody(writer, webResponse)
 
 }
+
+func (controller *AuthControllerImpl) UploadIamge(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	file := helper.MultipartForm("userImage", request)
+
+	uploadResponse := controller.Upload.Upload(file, "users")
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   uploadResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

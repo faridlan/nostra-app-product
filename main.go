@@ -38,6 +38,7 @@ func main() {
 	router.PUT("/api/users/:userId", userController.Update)
 	router.GET("/api/users/:userId", userController.FindById)
 	router.GET("/api/users", userController.FindAll)
+	router.POST("/api/users/image", userController.UploadIamge)
 
 	//Role
 	roleRepository := repository.NewRoleRepository()
