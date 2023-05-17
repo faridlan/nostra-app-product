@@ -111,6 +111,27 @@ func (service *AuthServiceImpl) FindAll(ctx context.Context) []web.UserResponse 
 	return helper.ToUserResponses(users)
 }
 
+func (service *AuthServiceImpl) Login(ctx context.Context, request web.UserCreateReq) web.LoginResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	userReq := domain.User{
+		Username: request.Username,
+		Password: request.Password,
+	}
+
+	UserResponse, err := service.UserRepo.Login(ctx, tx, userReq)
+	helper.PanicIfError(err)
+
+	tokenString := helper.JwtGen(UserResponse)
+	userResponseLogin := helper.ToLoginResponse(UserResponse)
+	userResponseLogin.Token = tokenString
+
+	return userResponseLogin
+
+}
+
 func (service *AuthServiceImpl) SaveMany(ctx context.Context, request []web.UserCreateReq) []web.UserResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)

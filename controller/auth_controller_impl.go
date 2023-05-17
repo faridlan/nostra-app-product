@@ -84,6 +84,22 @@ func (controller *AuthControllerImpl) FindAll(writer http.ResponseWriter, reques
 
 }
 
+func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	loginReq := web.UserCreateReq{}
+	helper.ReadFromRequestBody(request, &loginReq)
+
+	user := controller.AuthService.Login(request.Context(), loginReq)
+
+	webRespone := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   user,
+	}
+
+	helper.WriteToResponseBody(writer, webRespone)
+}
+
 func (controller *AuthControllerImpl) CreateMany(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	users, err := JsonUsers.ReadFile("json/users.json")
 	helper.PanicIfError(err)

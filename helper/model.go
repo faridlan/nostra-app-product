@@ -95,3 +95,15 @@ func ToRoleResponses(roles []domain.Role) []web.RoleResponse {
 
 	return roleResponses
 }
+
+func ToLoginResponse(user domain.User) web.LoginResponse {
+	return web.LoginResponse{
+		User: &web.UserResponse{
+			Id:       user.Id,
+			Username: user.Username,
+			Email:    user.Email,
+			Image:    user.Image,
+			RoleId:   user.RoleId,
+		},
+	}
+}

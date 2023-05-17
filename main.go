@@ -39,6 +39,9 @@ func main() {
 	router.GET("/api/users/:userId", userController.FindById)
 	router.GET("/api/users", userController.FindAll)
 
+	//auth user
+	router.POST("/api/users/login", userController.Login)
+
 	//Role
 	roleRepository := repository.NewRoleRepository()
 	roleService := service.NewRoleService(roleRepository, db, validate)

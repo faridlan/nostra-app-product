@@ -62,7 +62,7 @@ func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *UserRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx, userId int) (domain.User, error) {
-	SQL := `SELECT REPLACE(BIN_TO_UUID(user_id), '-', '') as use_id, username, email, image, REPLACE(BIN_TO_UUID(role_id), '-', ''), created_at, updated_at 
+	SQL := `SELECT REPLACE(BIN_TO_UUID(user_id), '-', '') as user_id, username, email, image, REPLACE(BIN_TO_UUID(role_id), '-', ''), created_at, updated_at 
 	FROM users WHERE id = ?`
 
 	rows, err := tx.QueryContext(ctx, SQL, userId)
@@ -84,7 +84,7 @@ func (repository *UserRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx, us
 }
 
 func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.User {
-	SQL := "SELECT REPLACE(BIN_TO_UUID(user_id), '-', '') as use_id, username, email, image, REPLACE(BIN_TO_UUID(role_id), '-', ''), created_at, updated_at FROM users"
+	SQL := "SELECT REPLACE(BIN_TO_UUID(user_id), '-', '') as user_id, username, email, image, REPLACE(BIN_TO_UUID(role_id), '-', ''), created_at, updated_at FROM users"
 
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
@@ -103,6 +103,27 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 
 	return users
 
+}
+
+func (repository *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
+	SQL := `SELECT REPLACE(BIN_TO_UUID(user_id), '-', '') as user_id, username, email, image, REPLACE(BIN_TO_UUID(role_id), '-', '')
+	FROM users WHERE username= ? and password = ?`
+
+	rows, err := tx.QueryContext(ctx, SQL, user.Username, user.Password)
+	helper.PanicIfError(err)
+
+	defer rows.Close()
+
+	userModel := domain.User{}
+
+	if rows.Next() {
+		err := rows.Scan(&userModel.Id, &userModel.Username, &userModel.Email, &userModel.Image, &userModel.RoleId)
+		helper.PanicIfError(err)
+
+		return userModel, nil
+	} else {
+		return userModel, errors.New("unauthorized")
+	}
 }
 
 func (repository *UserRepositoryImpl) SaveMany(ctx context.Context, tx *sql.Tx, users []domain.User) []domain.User {

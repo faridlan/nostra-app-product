@@ -1,6 +1,7 @@
 package exception
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/helper"
@@ -35,6 +36,8 @@ func internalServerError(writer http.ResponseWriter, request *http.Request, err 
 		Status: "INTERNAL SERVER ERROR",
 		Data:   err,
 	}
+
+	log.Println(err)
 
 	helper.WriteToResponseBody(writer, webResponse)
 

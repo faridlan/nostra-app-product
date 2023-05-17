@@ -11,3 +11,8 @@ type UserResponse struct {
 	CreatedAt int64             `json:"created_at,omitempty"`
 	UpdatedAt *mysql.NullInt    `json:"updated_at,omitempty"`
 }
+
+type LoginResponse struct {
+	User  *UserResponse `json:"user,omitempty"`
+	Token string        `json:"token,omitempty"`
+}
