@@ -7,6 +7,7 @@ import (
 
 	"github.com/faridlan/nostra-api-product/exception"
 	"github.com/faridlan/nostra-api-product/helper"
+	"github.com/faridlan/nostra-api-product/helper/hash"
 	"github.com/faridlan/nostra-api-product/helper/mysql"
 	"github.com/faridlan/nostra-api-product/model/domain"
 	"github.com/faridlan/nostra-api-product/model/web"
@@ -40,10 +41,12 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 	}
 
 	imageString := mysql.NewNullString(request.Image)
+	hash := hash.HashAndSalt([]byte(request.Password))
+
 	user := domain.User{
 		Id:        request.Id,
 		Username:  request.Username,
-		Password:  request.Password,
+		Password:  hash,
 		Email:     request.Email,
 		Image:     imageString,
 		RoleId:    request.RoleId,
@@ -111,25 +114,33 @@ func (service *AuthServiceImpl) FindAll(ctx context.Context) []web.UserResponse 
 	return helper.ToUserResponses(users)
 }
 
-func (service *AuthServiceImpl) Login(ctx context.Context, request web.UserCreateReq) web.LoginResponse {
+func (service *AuthServiceImpl) Login(ctx context.Context, request web.Login) web.LoginResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	userReq := domain.User{
-		Username: request.Username,
-		Password: request.Password,
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
+	if err != nil {
+		panic(exception.NewValidationError(errors))
 	}
 
-	UserResponse, err := service.UserRepo.Login(ctx, tx, userReq)
-	helper.PanicIfError(err)
+	userReq := domain.User{
+		Username: request.Username,
+	}
+
+	UserResponse, _ := service.UserRepo.Login(ctx, tx, userReq)
+
+	err = hash.ComparePassword(UserResponse.Password, []byte(request.Password))
+	if err != nil {
+		panic(exception.NewInterfaceErrorUnauth(err.Error()))
+	}
 
 	tokenString := helper.JwtGen(UserResponse)
 	userResponseLogin := helper.ToLoginResponse(UserResponse)
 	userResponseLogin.Token = tokenString
 
 	return userResponseLogin
-
 }
 
 func (service *AuthServiceImpl) SaveMany(ctx context.Context, request []web.UserCreateReq) []web.UserResponse {

@@ -86,7 +86,7 @@ func (controller *AuthControllerImpl) FindAll(writer http.ResponseWriter, reques
 
 func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	loginReq := web.UserCreateReq{}
+	loginReq := web.Login{}
 	helper.ReadFromRequestBody(request, &loginReq)
 
 	user := controller.AuthService.Login(request.Context(), loginReq)

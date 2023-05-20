@@ -14,6 +14,10 @@ func ExceptionError(writer http.ResponseWriter, request *http.Request, err any) 
 		return
 	}
 
+	if unauthorizedError(writer, request, err) {
+		return
+	}
+
 	if validationError(writer, request, err) {
 		return
 	}
@@ -53,6 +57,26 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err any) b
 		webResponse := web.WebResponse{
 			Code:   http.StatusNotFound,
 			Status: "NOT FOUND",
+			Data:   exception.Error,
+		}
+
+		helper.WriteToResponseBody(writer, webResponse)
+		return true
+	} else {
+		return false
+	}
+}
+
+func unauthorizedError(writer http.ResponseWriter, request *http.Request, err any) bool {
+	exception, ok := err.(InterfaceErrorUnauth)
+
+	if ok {
+		writer.Header().Add("content-type", "application/json")
+		writer.WriteHeader(http.StatusUnauthorized)
+
+		webResponse := web.WebResponse{
+			Code:   http.StatusUnauthorized,
+			Status: "UNAUTHORIZED",
 			Data:   exception.Error,
 		}
 

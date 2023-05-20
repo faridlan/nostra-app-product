@@ -106,10 +106,10 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 }
 
 func (repository *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
-	SQL := `SELECT REPLACE(BIN_TO_UUID(user_id), '-', '') as user_id, username, email, image, REPLACE(BIN_TO_UUID(role_id), '-', '')
-	FROM users WHERE username= ? and password = ?`
+	SQL := `SELECT REPLACE(BIN_TO_UUID(user_id), '-', '') as user_id, username, password, email, image, REPLACE(BIN_TO_UUID(role_id), '-', '')
+	FROM users WHERE username= ?`
 
-	rows, err := tx.QueryContext(ctx, SQL, user.Username, user.Password)
+	rows, err := tx.QueryContext(ctx, SQL, user.Username)
 	helper.PanicIfError(err)
 
 	defer rows.Close()
@@ -117,12 +117,12 @@ func (repository *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, use
 	userModel := domain.User{}
 
 	if rows.Next() {
-		err := rows.Scan(&userModel.Id, &userModel.Username, &userModel.Email, &userModel.Image, &userModel.RoleId)
+		err := rows.Scan(&userModel.Id, &userModel.Username, &userModel.Password, &userModel.Email, &userModel.Image, &userModel.RoleId)
 		helper.PanicIfError(err)
 
 		return userModel, nil
 	} else {
-		return userModel, errors.New("unauthorized")
+		return userModel, errors.New("username or password incorect")
 	}
 }
 
