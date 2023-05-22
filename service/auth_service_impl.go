@@ -29,7 +29,7 @@ func NewAuthService(userRepo repository.UserRepository, db *sql.DB, validate *va
 	}
 }
 
-func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCreateReq) web.UserResponse {
+func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCreateReq) web.LoginResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -57,7 +57,12 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 	user, err = service.UserRepo.FindId(ctx, tx, user.UserId)
 	helper.PanicIfError(err)
 
-	return helper.ToUserResponse(user)
+	tokenString := helper.JwtGen(user)
+	userResponseLogin := helper.ToLoginResponse(user)
+	userResponseLogin.Token = tokenString
+
+	return userResponseLogin
+
 }
 
 func (service *AuthServiceImpl) Update(ctx context.Context, request web.UserUpdateReq) web.UserResponse {
