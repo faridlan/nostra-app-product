@@ -44,13 +44,17 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 	hash := hash.HashAndSalt([]byte(request.Password))
 
 	user := domain.User{
-		Id:        request.Id,
-		Username:  request.Username,
-		Password:  hash,
-		Email:     request.Email,
-		Image:     imageString,
-		RoleId:    request.RoleId,
+		UserId:   0,
+		Id:       request.Id,
+		Username: request.Username,
+		Password: hash,
+		Email:    request.Email,
+		Image:    imageString,
+		Role: domain.Role{
+			Id: request.RoleId,
+		},
 		CreatedAt: time.Now().UnixMilli(),
+		UpdatedAt: &mysql.NullInt{},
 	}
 
 	user = service.UserRepo.Save(ctx, tx, user)
@@ -87,7 +91,7 @@ func (service *AuthServiceImpl) Update(ctx context.Context, request web.UserUpda
 	user.Username = request.Username
 	user.Email = request.Email
 	user.Image = imageString
-	user.RoleId = request.RoleId
+	user.Role.Id = request.RoleId
 	user.UpdatedAt = updateInt
 
 	user = service.UserRepo.Update(ctx, tx, user)
@@ -164,13 +168,14 @@ func (service *AuthServiceImpl) SaveMany(ctx context.Context, request []web.User
 		user.Password = req.Password
 		user.Email = req.Email
 		user.Image = imageString
-		user.RoleId = req.RoleId
+		user.Role.Id = req.RoleId
 		user.CreatedAt = time.Now().UnixMilli()
 
 		users = append(users, user)
 	}
 
-	users = service.UserRepo.SaveMany(ctx, tx, users)
+	service.UserRepo.SaveMany(ctx, tx, users)
+	users = service.UserRepo.FindAll(ctx, tx)
 
 	return helper.ToUserResponses(users)
 }

@@ -18,7 +18,7 @@ func JwtGen(user domain.User) string {
 		Id:       user.Id,
 		Username: user.Username,
 		Email:    user.Email,
-		RoleId:   user.RoleId,
+		RoleId:   user.Role.Id,
 		Token:    strRandom,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationtime),

@@ -57,11 +57,14 @@ func ToCategoryResponses(categories []domain.Category) []web.CategoryResponse {
 
 func ToUserResponse(user domain.User) web.UserResponse {
 	return web.UserResponse{
-		Id:        user.Id,
-		Username:  user.Username,
-		Email:     user.Email,
-		Image:     user.Image,
-		RoleId:    user.RoleId,
+		Id:       user.Id,
+		Username: user.Username,
+		Email:    user.Email,
+		Image:    user.Image,
+		Role: &web.RoleResponse{
+			Id:   user.Role.Id,
+			Name: user.Role.Name,
+		},
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
@@ -103,7 +106,10 @@ func ToLoginResponse(user domain.User) web.LoginResponse {
 			Username: user.Username,
 			Email:    user.Email,
 			Image:    user.Image,
-			RoleId:   user.RoleId,
+			Role: &web.RoleResponse{
+				Id:   user.Role.Id,
+				Name: user.Role.Name,
+			},
 		},
 	}
 }

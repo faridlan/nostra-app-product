@@ -11,7 +11,7 @@ type User struct {
 	Password  string
 	Email     string
 	Image     *mysql.NullString
-	RoleId    string
+	Role      Role
 	CreatedAt int64
 	UpdatedAt *mysql.NullInt
 }

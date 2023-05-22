@@ -7,7 +7,7 @@ type UserResponse struct {
 	Username  string            `json:"username,omitempty"`
 	Email     string            `json:"email,omitempty"`
 	Image     *mysql.NullString `json:"image"`
-	RoleId    string            `json:"role_id,omitempty"`
+	Role      *RoleResponse     `json:"role,omitempty"`
 	CreatedAt int64             `json:"created_at,omitempty"`
 	UpdatedAt *mysql.NullInt    `json:"updated_at"`
 }
