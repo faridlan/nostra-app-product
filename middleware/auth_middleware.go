@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -39,6 +40,11 @@ func (authMiddleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, requ
 	// }
 
 	if request.URL.Path == "/api/users/login" {
+		authMiddleware.Handler.ServeHTTP(writer, request)
+		return
+	}
+
+	if request.URL.Path == "/api/users" && request.Method == "POST" {
 		authMiddleware.Handler.ServeHTTP(writer, request)
 		return
 	}
@@ -98,6 +104,20 @@ func (authMiddleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, requ
 		return
 	}
 
+	if request.URL.Path == "/api/users/profile" && request.Method == "GET" && claim.RoleId != "7f03c5c7f97711ed9f900242ac130002" {
+		writer.Header().Add("Content-Type", "application.json")
+		writer.WriteHeader(http.StatusUnauthorized)
+
+		webResponse := web.WebResponse{
+			Code:   http.StatusUnauthorized,
+			Status: "UNAUTHORIZED",
+		}
+
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
+
+	log.Println(claim.RoleId)
 	authMiddleware.Handler.ServeHTTP(writer, request)
 
 }

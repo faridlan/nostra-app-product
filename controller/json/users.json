@@ -12,14 +12,14 @@
     "password": "secret",
     "email": "user2@gmail.com",
     "image": "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png",
-    "role_id": "d8701c11ec1711edbcb90242ac130002",
+    "role_id": "d11cd32cfa4811edbc140242ac130002",
     "created_at": 1683382375226
   },
   {
     "username": "user3", 
     "password": "secret",
     "email": "user3@gmail.com",
-    "role_id": "d8701c11ec1711edbcb90242ac130002",
+    "role_id": "d11cd32cfa4811edbc140242ac130002",
     "created_at": 1683382375226
   }
 ]
