@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/helper"
+	"github.com/faridlan/nostra-api-product/helper/auth"
 	"github.com/faridlan/nostra-api-product/model/web"
 	"github.com/faridlan/nostra-api-product/service"
 	"github.com/julienschmidt/httprouter"
@@ -61,6 +62,19 @@ func (controller *AuthControllerImpl) Update(writer http.ResponseWriter, request
 
 func (controller *AuthControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	Id := params.ByName("userId")
+
+	user := controller.AuthService.FindById(request.Context(), Id)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   user,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *AuthControllerImpl) Profile(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	Id := auth.GetIdProfile(request)
 
 	user := controller.AuthService.FindById(request.Context(), Id)
 	webResponse := web.WebResponse{
