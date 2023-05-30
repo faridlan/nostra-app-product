@@ -163,9 +163,10 @@ func (service *AuthServiceImpl) SaveMany(ctx context.Context, request []web.User
 		user := domain.User{}
 
 		imageString := mysql.NewNullString(req.Image)
+		hash := hash.HashAndSalt([]byte(req.Password))
 
 		user.Username = req.Username
-		user.Password = req.Password
+		user.Password = hash
 		user.Email = req.Email
 		user.Image = imageString
 		user.Role.Id = req.RoleId
