@@ -12,7 +12,7 @@ func JwtGen(user domain.User) string {
 
 	strRandom := RandStringRunes(20)
 
-	expirationtime := time.Now().Add(5 * time.Minute)
+	expirationtime := time.Now().Add(60 * time.Minute)
 
 	claim := &web.JWTClaim{
 		Id:       user.Id,
