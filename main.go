@@ -8,6 +8,7 @@ import (
 	"github.com/faridlan/nostra-api-product/controller"
 	"github.com/faridlan/nostra-api-product/exception"
 	"github.com/faridlan/nostra-api-product/helper"
+	"github.com/faridlan/nostra-api-product/middleware"
 	"github.com/faridlan/nostra-api-product/repository"
 	"github.com/faridlan/nostra-api-product/service"
 	"github.com/go-playground/validator/v10"
@@ -94,9 +95,9 @@ func main() {
 	router.PanicHandler = exception.ExceptionError
 
 	server := http.Server{
-		Addr: "localhost:8080",
-		// Handler: middleware.NewAuthMiddleware(router),
-		Handler: router,
+		Addr:    "localhost:8080",
+		Handler: middleware.NewAuthMiddleware(router),
+		// Handler: router,
 	}
 
 	fmt.Println("server running at Port 8080")

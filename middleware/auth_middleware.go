@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -24,20 +23,6 @@ func NewAuthMiddleware(handler http.Handler) *AuthMiddleware {
 func (authMiddleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	authorizationHeader := request.Header.Get("Authorization")
-
-	// enpoints := exception.EndpointsGlobal()
-
-	// for _, Enpoint := range enpoints {
-	// 	if request.URL.Path != Enpoint.Url && request.Method != Enpoint.Method {
-	// 		authMiddleware.Handler.ServeHTTP(writer, request)
-	// 		return
-	// 	}
-	// }
-
-	// if request.URL.Path != "/api/seeder/products" && request.URL.Path != "api/log" {
-	// 	authMiddleware.Handler.ServeHTTP(writer, request)
-	// 	return
-	// }
 
 	if request.URL.Path == "/api/users/login" {
 		authMiddleware.Handler.ServeHTTP(writer, request)
@@ -100,11 +85,25 @@ func (authMiddleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, requ
 		}
 
 		helper.WriteToResponseBody(writer, webResponse)
-		writer.WriteHeader(http.StatusBadRequest)
 		return
-	}
+	} else {
 
-	if request.URL.Path == "/api/users/profile" && request.Method == "GET" && claim.RoleId != "7f03c5c7f97711ed9f900242ac130002" {
+		endpoints := helper.UserEndpoints(request)
+
+		for _, enpoint := range endpoints {
+			if request.URL.Path == enpoint.Url && request.Method == enpoint.Method && claim.RoleId == "d11cd32cfa4811edbc140242ac130002" {
+
+				authMiddleware.Handler.ServeHTTP(writer, request)
+				return
+
+			} else if claim.RoleId != "d11cd32cfa4811edbc140242ac130002" {
+
+				authMiddleware.Handler.ServeHTTP(writer, request)
+				return
+
+			}
+		}
+
 		writer.Header().Add("Content-Type", "application.json")
 		writer.WriteHeader(http.StatusUnauthorized)
 
@@ -115,9 +114,9 @@ func (authMiddleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, requ
 
 		helper.WriteToResponseBody(writer, webResponse)
 		return
+
 	}
 
-	log.Println(claim.RoleId)
-	authMiddleware.Handler.ServeHTTP(writer, request)
+	// authMiddleware.Handler.ServeHTTP(writer, request)
 
 }
