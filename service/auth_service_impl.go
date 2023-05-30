@@ -7,6 +7,7 @@ import (
 
 	"github.com/faridlan/nostra-api-product/exception"
 	"github.com/faridlan/nostra-api-product/helper"
+	"github.com/faridlan/nostra-api-product/helper/hash"
 	"github.com/faridlan/nostra-api-product/helper/mysql"
 	"github.com/faridlan/nostra-api-product/model/domain"
 	"github.com/faridlan/nostra-api-product/model/web"
@@ -28,7 +29,7 @@ func NewAuthService(userRepo repository.UserRepository, db *sql.DB, validate *va
 	}
 }
 
-func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCreateReq) web.UserResponse {
+func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCreateReq) web.LoginResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -40,21 +41,32 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 	}
 
 	imageString := mysql.NewNullString(request.Image)
+	hash := hash.HashAndSalt([]byte(request.Password))
+
 	user := domain.User{
-		Id:        request.Id,
-		Username:  request.Username,
-		Password:  request.Password,
-		Email:     request.Email,
-		Image:     imageString,
-		RoleId:    request.RoleId,
+		UserId:   0,
+		Id:       request.Id,
+		Username: request.Username,
+		Password: hash,
+		Email:    request.Email,
+		Image:    imageString,
+		Role: domain.Role{
+			Id: request.RoleId,
+		},
 		CreatedAt: time.Now().UnixMilli(),
+		UpdatedAt: &mysql.NullInt{},
 	}
 
 	user = service.UserRepo.Save(ctx, tx, user)
 	user, err = service.UserRepo.FindId(ctx, tx, user.UserId)
 	helper.PanicIfError(err)
 
-	return helper.ToUserResponse(user)
+	tokenString := helper.JwtGen(user)
+	userResponseLogin := helper.ToLoginResponse(user)
+	userResponseLogin.Token = tokenString
+
+	return userResponseLogin
+
 }
 
 func (service *AuthServiceImpl) Update(ctx context.Context, request web.UserUpdateReq) web.UserResponse {
@@ -79,7 +91,7 @@ func (service *AuthServiceImpl) Update(ctx context.Context, request web.UserUpda
 	user.Username = request.Username
 	user.Email = request.Email
 	user.Image = imageString
-	user.RoleId = request.RoleId
+	user.Role.Id = request.RoleId
 	user.UpdatedAt = updateInt
 
 	user = service.UserRepo.Update(ctx, tx, user)
@@ -111,6 +123,35 @@ func (service *AuthServiceImpl) FindAll(ctx context.Context) []web.UserResponse 
 	return helper.ToUserResponses(users)
 }
 
+func (service *AuthServiceImpl) Login(ctx context.Context, request web.Login) web.LoginResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	err = service.Validate.Struct(request)
+	errors := helper.TranslateError(err, service.Validate)
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
+
+	userReq := domain.User{
+		Username: request.Username,
+	}
+
+	UserResponse, _ := service.UserRepo.Login(ctx, tx, userReq)
+
+	err = hash.ComparePassword(UserResponse.Password, []byte(request.Password))
+	if err != nil {
+		panic(exception.NewInterfaceErrorUnauth(err.Error()))
+	}
+
+	tokenString := helper.JwtGen(UserResponse)
+	userResponseLogin := helper.ToLoginResponse(UserResponse)
+	userResponseLogin.Token = tokenString
+
+	return userResponseLogin
+}
+
 func (service *AuthServiceImpl) SaveMany(ctx context.Context, request []web.UserCreateReq) []web.UserResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
@@ -122,18 +163,20 @@ func (service *AuthServiceImpl) SaveMany(ctx context.Context, request []web.User
 		user := domain.User{}
 
 		imageString := mysql.NewNullString(req.Image)
+		hash := hash.HashAndSalt([]byte(req.Password))
 
 		user.Username = req.Username
-		user.Password = req.Password
+		user.Password = hash
 		user.Email = req.Email
 		user.Image = imageString
-		user.RoleId = req.RoleId
+		user.Role.Id = req.RoleId
 		user.CreatedAt = time.Now().UnixMilli()
 
 		users = append(users, user)
 	}
 
-	users = service.UserRepo.SaveMany(ctx, tx, users)
+	service.UserRepo.SaveMany(ctx, tx, users)
+	users = service.UserRepo.FindAll(ctx, tx)
 
 	return helper.ToUserResponses(users)
 }

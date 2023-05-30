@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/helper"
+	"github.com/faridlan/nostra-api-product/helper/auth"
 	"github.com/faridlan/nostra-api-product/model/web"
 	"github.com/faridlan/nostra-api-product/service"
 	"github.com/julienschmidt/httprouter"
@@ -72,6 +73,19 @@ func (controller *AuthControllerImpl) FindById(writer http.ResponseWriter, reque
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
+func (controller *AuthControllerImpl) Profile(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	Id := auth.GetIdProfile(request)
+
+	user := controller.AuthService.FindById(request.Context(), Id)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   user,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
 func (controller *AuthControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	users := controller.AuthService.FindAll(request.Context())
 	webResponse := web.WebResponse{
@@ -82,6 +96,22 @@ func (controller *AuthControllerImpl) FindAll(writer http.ResponseWriter, reques
 
 	helper.WriteToResponseBody(writer, webResponse)
 
+}
+
+func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	loginReq := web.Login{}
+	helper.ReadFromRequestBody(request, &loginReq)
+
+	user := controller.AuthService.Login(request.Context(), loginReq)
+
+	webRespone := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   user,
+	}
+
+	helper.WriteToResponseBody(writer, webRespone)
 }
 
 func (controller *AuthControllerImpl) CreateMany(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {

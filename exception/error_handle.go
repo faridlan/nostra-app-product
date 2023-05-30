@@ -1,6 +1,7 @@
 package exception
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/helper"
@@ -10,6 +11,10 @@ import (
 func ExceptionError(writer http.ResponseWriter, request *http.Request, err any) {
 
 	if notFoundError(writer, request, err) {
+		return
+	}
+
+	if unauthorizedError(writer, request, err) {
 		return
 	}
 
@@ -36,6 +41,8 @@ func internalServerError(writer http.ResponseWriter, request *http.Request, err 
 		Data:   err,
 	}
 
+	log.Println(err)
+
 	helper.WriteToResponseBody(writer, webResponse)
 
 }
@@ -50,6 +57,26 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err any) b
 		webResponse := web.WebResponse{
 			Code:   http.StatusNotFound,
 			Status: "NOT FOUND",
+			Data:   exception.Error,
+		}
+
+		helper.WriteToResponseBody(writer, webResponse)
+		return true
+	} else {
+		return false
+	}
+}
+
+func unauthorizedError(writer http.ResponseWriter, request *http.Request, err any) bool {
+	exception, ok := err.(InterfaceErrorUnauth)
+
+	if ok {
+		writer.Header().Add("content-type", "application/json")
+		writer.WriteHeader(http.StatusUnauthorized)
+
+		webResponse := web.WebResponse{
+			Code:   http.StatusUnauthorized,
+			Status: "UNAUTHORIZED",
 			Data:   exception.Error,
 		}
 
