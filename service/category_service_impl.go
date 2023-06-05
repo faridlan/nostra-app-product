@@ -47,7 +47,9 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request web.Cate
 	categoryResult := service.CategoryRepo.Save(ctx, tx, cateogry)
 
 	categoryResult, err = service.CategoryRepo.FindId(ctx, tx, categoryResult.CateogoryId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	return helper.ToCategoryResponse(categoryResult)
 }
@@ -98,10 +100,7 @@ func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId str
 	defer helper.CommitOrRollback(tx)
 
 	category, err := service.CategoryRepo.FindById(ctx, tx, categoryId)
-
-	if err != nil {
-		panic(exception.NewInterfaceError(err.Error()))
-	}
+	helper.PanicIfError(err)
 
 	return helper.ToCategoryResponse(category)
 }

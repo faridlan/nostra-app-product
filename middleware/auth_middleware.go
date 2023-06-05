@@ -91,12 +91,12 @@ func (authMiddleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, requ
 		endpoints := helper.UserEndpoints(request)
 
 		for _, enpoint := range endpoints {
-			if request.URL.Path == enpoint.Url && request.Method == enpoint.Method && claim.RoleId == "d11cd32cfa4811edbc140242ac130002" {
+			if request.URL.Path == enpoint.Url && request.Method == enpoint.Method && claim.RoleId != "a6d0e7be03b411eeaa7a0242ac120003" {
 
 				authMiddleware.Handler.ServeHTTP(writer, request)
 				return
 
-			} else if claim.RoleId != "d11cd32cfa4811edbc140242ac130002" {
+			} else if claim.RoleId == "a6d0e7be03b411eeaa7a0242ac120003" {
 
 				authMiddleware.Handler.ServeHTTP(writer, request)
 				return

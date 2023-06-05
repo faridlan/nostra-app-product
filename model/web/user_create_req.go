@@ -6,6 +6,6 @@ type UserCreateReq struct {
 	Password  string `json:"password,omitempty" validate:"required,gte=8"`
 	Email     string `json:"email,omitempty" validate:"required,email"`
 	Image     string `json:"image,omitempty"`
-	RoleId    string `json:"role_id,omitempty" validate:"required"`
+	RoleId    string `json:"role_id,omitempty"`
 	CreatedAt int64  `json:"created_at,omitempty"`
 }
