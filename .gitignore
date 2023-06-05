@@ -1,3 +1,4 @@
 .env
 z_database_sql
 spech
+dockerfile
