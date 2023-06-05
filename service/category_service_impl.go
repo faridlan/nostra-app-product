@@ -98,7 +98,10 @@ func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId str
 	defer helper.CommitOrRollback(tx)
 
 	category, err := service.CategoryRepo.FindById(ctx, tx, categoryId)
-	helper.PanicIfError(err)
+
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	return helper.ToCategoryResponse(category)
 }
