@@ -15,6 +15,7 @@ type JWTClaim struct {
 	Username string `json:"username,omitempty"`
 	Email    string `json:"email,omitempty"`
 	RoleId   string `json:"role_id,omitempty"`
+	RoleName string `json:"role_name,omitempty"`
 	Token    string `json:"token,omitempty"`
 	jwt.RegisteredClaims
 }
