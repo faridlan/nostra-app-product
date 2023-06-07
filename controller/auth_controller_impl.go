@@ -47,7 +47,7 @@ func (controller *AuthControllerImpl) Update(writer http.ResponseWriter, request
 	helper.ReadFromRequestBody(request, &userUpdate)
 
 	Id := params.ByName("userId")
-	userUpdate.Id = Id
+	userUpdate.UserId = Id
 
 	user := controller.AuthService.Update(request.Context(), userUpdate)
 	webResponse := web.WebResponse{

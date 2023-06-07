@@ -24,14 +24,14 @@ func (repository *RoleRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, role
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
-	role.RoleId = int(id)
+	role.Id = int(id)
 
 	return role
 }
 
 func (repository *RoleRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, role domain.Role) domain.Role {
 	SQL := "UPDATE roles SET name = ?, updated_at = ? WHERE REPLACE(BIN_TO_UUID(role_id), '-', '') = ?"
-	_, err := tx.ExecContext(ctx, SQL, role.Name, role.UpdatedAt, role.Id)
+	_, err := tx.ExecContext(ctx, SQL, role.Name, role.UpdatedAt, role.RoleId)
 	helper.PanicIfError(err)
 
 	return role
@@ -47,7 +47,7 @@ func (repository *RoleRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 	role := domain.Role{}
 
 	if rows.Next() {
-		err := rows.Scan(&role.Id, &role.Name, &role.CreatedAt, &role.UpdatedAt)
+		err := rows.Scan(&role.RoleId, &role.Name, &role.CreatedAt, &role.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return role, nil
@@ -66,7 +66,7 @@ func (repository *RoleRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 	roles := []domain.Role{}
 	for rows.Next() {
 		role := domain.Role{}
-		err := rows.Scan(&role.Id, &role.Name, &role.CreatedAt, &role.UpdatedAt)
+		err := rows.Scan(&role.RoleId, &role.Name, &role.CreatedAt, &role.UpdatedAt)
 		helper.PanicIfError(err)
 
 		roles = append(roles, role)
@@ -85,7 +85,7 @@ func (repository *RoleRepositoryImpl) FindByName(ctx context.Context, tx *sql.Tx
 	role := domain.Role{}
 
 	if rows.Next() {
-		err := rows.Scan(&role.Id, &role.Name, &role.CreatedAt, &role.UpdatedAt)
+		err := rows.Scan(&role.RoleId, &role.Name, &role.CreatedAt, &role.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return role, nil
@@ -109,7 +109,7 @@ func (repository *RoleRepositoryImpl) SaveMany(ctx context.Context, tx *sql.Tx, 
 		id, err := result.LastInsertId()
 		helper.PanicIfError(err)
 
-		role.RoleId = int(id)
+		role.Id = int(id)
 	}
 
 	return roles

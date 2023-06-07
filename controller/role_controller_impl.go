@@ -46,7 +46,7 @@ func (controller *RoleControllerImpl) Update(writer http.ResponseWriter, request
 
 	id := params.ByName("roleId")
 
-	roleUpdate.Id = id
+	roleUpdate.RoleId = id
 
 	roleResponse := controller.RoleService.Update(request.Context(), roleUpdate)
 

@@ -52,14 +52,14 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 	hash := hash.HashAndSalt([]byte(request.Password))
 
 	user := domain.User{
-		UserId:   0,
-		Id:       request.Id,
+		Id:       0,
+		UserId:   request.UserId,
 		Username: request.Username,
 		Password: hash,
 		Email:    request.Email,
 		Image:    imageString,
 		Role: domain.Role{
-			Id: request.RoleId,
+			RoleId: request.RoleId,
 		},
 		CreatedAt: time.Now().UnixMilli(),
 		UpdatedAt: &mysql.NullInt{},
@@ -70,10 +70,10 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 		panic(exception.NewInterfaceError(err.Error()))
 	}
 
-	user.Role.Id = role.Id
+	user.Role.RoleId = role.RoleId
 
 	user = service.UserRepo.Save(ctx, tx, user)
-	user, err = service.UserRepo.FindId(ctx, tx, user.UserId)
+	user, err = service.UserRepo.FindId(ctx, tx, user.Id)
 	if err != nil {
 		panic(exception.NewInterfaceError(err.Error()))
 	}
@@ -97,7 +97,7 @@ func (service *AuthServiceImpl) Update(ctx context.Context, request web.UserUpda
 		panic(exception.NewValidationError(errors))
 	}
 
-	user, err := service.UserRepo.FindById(ctx, tx, request.Id)
+	user, err := service.UserRepo.FindById(ctx, tx, request.UserId)
 	if err != nil {
 		panic(exception.NewInterfaceError(err.Error()))
 	}
@@ -108,7 +108,7 @@ func (service *AuthServiceImpl) Update(ctx context.Context, request web.UserUpda
 	user.Username = request.Username
 	user.Email = request.Email
 	user.Image = imageString
-	user.Role.Id = request.RoleId
+	user.Role.RoleId = request.RoleId
 	user.UpdatedAt = updateInt
 
 	user = service.UserRepo.Update(ctx, tx, user)
@@ -187,7 +187,7 @@ func (service *AuthServiceImpl) SaveMany(ctx context.Context, request []web.User
 		user.Password = hash
 		user.Email = req.Email
 		user.Image = imageString
-		user.Role.Id = req.RoleId
+		user.Role.RoleId = req.RoleId
 		user.CreatedAt = time.Now().UnixMilli()
 
 		users = append(users, user)

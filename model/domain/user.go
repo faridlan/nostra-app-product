@@ -5,8 +5,8 @@ import (
 )
 
 type User struct {
-	UserId    int
-	Id        string
+	Id        int
+	UserId    string
 	Username  string
 	Password  string
 	Email     string
