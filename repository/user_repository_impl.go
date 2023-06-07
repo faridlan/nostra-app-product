@@ -98,11 +98,9 @@ func (repository *UserRepositoryImpl) FindName(ctx context.Context, tx *sql.Tx, 
 	user := domain.User{}
 
 	if !rows.Next() {
-		err := rows.Scan(&user.Username)
-		helper.PanicIfError(err)
 		return user.Username, nil
 	} else {
-		return user.Username, errors.New("username have been taken")
+		return user.Username, errors.New("username has been taken")
 	}
 
 }

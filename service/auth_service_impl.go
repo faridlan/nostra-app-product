@@ -43,9 +43,9 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 		panic(exception.NewValidationError(errors))
 	}
 
-	username, err := service.UserRepo.FindName(ctx, tx, request.Username)
+	_, err = service.UserRepo.FindName(ctx, tx, request.Username)
 	if err != nil {
-		panic(exception.NewValidationError(errors))
+		panic(exception.NewInterfaceErrorUnauth(err.Error()))
 	}
 
 	imageString := mysql.NewNullString(request.Image)
@@ -54,7 +54,7 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 	user := domain.User{
 		UserId:   0,
 		Id:       request.Id,
-		Username: username,
+		Username: request.Username,
 		Password: hash,
 		Email:    request.Email,
 		Image:    imageString,
