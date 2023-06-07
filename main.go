@@ -25,25 +25,6 @@ func main() {
 	//Upload
 	upload := service.NewUploadS3AWS()
 
-	//User
-	userRepository := repository.NewUserRepository()
-	userService := service.NewAuthService(userRepository, db, validate)
-	userController := controller.NewAuthController(userService, upload)
-
-	//User Seeder
-	router.POST("/api/users/seeder", userController.CreateMany)
-	router.DELETE("/api/users/seeder", userController.DeleteAll)
-
-	//User CRUD
-	router.POST("/api/users", userController.Register)
-	router.PUT("/api/users/:userId", userController.Update)
-	router.GET("/api/users", userController.FindAll)
-	router.GET("/api/users/profile/:userId", userController.FindById)
-	router.GET("/api/users/profile", userController.Profile)
-
-	//auth user
-	router.POST("/api/users/login", userController.Login)
-
 	//Role
 	roleRepository := repository.NewRoleRepository()
 	roleService := service.NewRoleService(roleRepository, db, validate)
@@ -53,11 +34,30 @@ func main() {
 	router.POST("/api/roles/seeder", roleController.SeederCreate)
 	router.DELETE("/api/roles/seeder", roleController.SeederDelete)
 
-	//CRUS
+	//CRUD
 	router.GET("/api/roles", roleController.FindAll)
 	router.GET("/api/roles/:roleId", roleController.FindById)
 	router.POST("/api/roles", roleController.Create)
 	router.PUT("/api/roles/:roleId", roleController.Update)
+
+	//User
+	userRepository := repository.NewUserRepository()
+	userService := service.NewAuthService(userRepository, roleRepository, db, validate)
+	userController := controller.NewAuthController(userService, upload)
+
+	//User Seeder
+	router.POST("/api/users/seeder", userController.CreateMany)
+	router.DELETE("/api/users/seeder", userController.DeleteAll)
+
+	//User CRUD
+	router.POST("/api/users/register", userController.Register)
+	router.PUT("/api/users/:userId", userController.Update)
+	router.GET("/api/users", userController.FindAll)
+	router.GET("/api/users/profile/:userId", userController.FindById)
+	router.GET("/api/users/profile", userController.Profile)
+
+	//auth user
+	router.POST("/api/users/login", userController.Login)
 
 	//Product
 	productRepository := repository.NewProductRepository()

@@ -75,6 +75,25 @@ func (repository *RoleRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 	return roles
 }
 
+func (repository *RoleRepositoryImpl) FindByName(ctx context.Context, tx *sql.Tx, name string) (domain.Role, error) {
+	SQL := "SELECT REPLACE(BIN_TO_UUID(role_id), '-', '') as role_id, name, created_at, updated_at FROM roles WHERE name = ?"
+	rows, err := tx.QueryContext(ctx, SQL, name)
+	helper.PanicIfError(err)
+
+	defer rows.Close()
+
+	role := domain.Role{}
+
+	if rows.Next() {
+		err := rows.Scan(&role.Id, &role.Name, &role.CreatedAt, &role.UpdatedAt)
+		helper.PanicIfError(err)
+
+		return role, nil
+	} else {
+		return role, errors.New("role not found")
+	}
+}
+
 func (repository *RoleRepositoryImpl) SaveMany(ctx context.Context, tx *sql.Tx, roles []domain.Role) []domain.Role {
 	SQL := "INSERT INTO roles(role_id, name, created_at) values (UUID_TO_BIN(UUID()),?,?)"
 

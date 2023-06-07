@@ -18,13 +18,15 @@ import (
 
 type AuthServiceImpl struct {
 	UserRepo repository.UserRepository
+	RoleRepo repository.RoleRepository
 	DB       *sql.DB
 	Validate *validator.Validate
 }
 
-func NewAuthService(userRepo repository.UserRepository, db *sql.DB, validate *validator.Validate) AuthService {
+func NewAuthService(userRepo repository.UserRepository, roleRepo repository.RoleRepository, db *sql.DB, validate *validator.Validate) AuthService {
 	return &AuthServiceImpl{
 		UserRepo: userRepo,
+		RoleRepo: roleRepo,
 		DB:       db,
 		Validate: validate,
 	}
@@ -41,13 +43,18 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 		panic(exception.NewValidationError(errors))
 	}
 
+	username, err := service.UserRepo.FindName(ctx, tx, request.Username)
+	if err != nil {
+		panic(exception.NewValidationError(errors))
+	}
+
 	imageString := mysql.NewNullString(request.Image)
 	hash := hash.HashAndSalt([]byte(request.Password))
 
 	user := domain.User{
 		UserId:   0,
 		Id:       request.Id,
-		Username: request.Username,
+		Username: username,
 		Password: hash,
 		Email:    request.Email,
 		Image:    imageString,
@@ -58,9 +65,18 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 		UpdatedAt: &mysql.NullInt{},
 	}
 
+	role, err := service.RoleRepo.FindByName(ctx, tx, "user")
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
+
+	user.Role.Id = role.Id
+
 	user = service.UserRepo.Save(ctx, tx, user)
 	user, err = service.UserRepo.FindId(ctx, tx, user.UserId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	tokenString := helper.JwtGen(user)
 	userResponseLogin := helper.ToLoginResponse(user)
