@@ -32,10 +32,6 @@ func (controller *AuthControllerImpl) Register(writer http.ResponseWriter, reque
 	userCreate := web.UserCreateReq{}
 	helper.ReadFromRequestBody(request, &userCreate)
 
-	if userCreate.RoleId == "" {
-		userCreate.RoleId = "c75696b003b411eeaa7a0242ac120003"
-	}
-
 	user := controller.AuthService.Register(request.Context(), userCreate)
 	webResponse := web.WebResponse{
 		Code:   200,
@@ -51,7 +47,7 @@ func (controller *AuthControllerImpl) Update(writer http.ResponseWriter, request
 	helper.ReadFromRequestBody(request, &userUpdate)
 
 	Id := params.ByName("userId")
-	userUpdate.Id = Id
+	userUpdate.UserId = Id
 
 	user := controller.AuthService.Update(request.Context(), userUpdate)
 	webResponse := web.WebResponse{

@@ -15,10 +15,11 @@ func JwtGen(user domain.User) string {
 	expirationtime := time.Now().Add(60 * time.Minute)
 
 	claim := &web.JWTClaim{
-		Id:       user.Id,
+		Id:       user.UserId,
 		Username: user.Username,
 		Email:    user.Email,
-		RoleId:   user.Role.Id,
+		RoleId:   user.Role.RoleId,
+		RoleName: user.Role.Name,
 		Token:    strRandom,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationtime),

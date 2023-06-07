@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/faridlan/nostra-api-product/exception"
@@ -17,13 +18,15 @@ import (
 
 type AuthServiceImpl struct {
 	UserRepo repository.UserRepository
+	RoleRepo repository.RoleRepository
 	DB       *sql.DB
 	Validate *validator.Validate
 }
 
-func NewAuthService(userRepo repository.UserRepository, db *sql.DB, validate *validator.Validate) AuthService {
+func NewAuthService(userRepo repository.UserRepository, roleRepo repository.RoleRepository, db *sql.DB, validate *validator.Validate) AuthService {
 	return &AuthServiceImpl{
 		UserRepo: userRepo,
+		RoleRepo: roleRepo,
 		DB:       db,
 		Validate: validate,
 	}
@@ -40,26 +43,40 @@ func (service *AuthServiceImpl) Register(ctx context.Context, request web.UserCr
 		panic(exception.NewValidationError(errors))
 	}
 
+	_, err = service.UserRepo.FindName(ctx, tx, request.Username)
+	if err != nil {
+		panic(exception.NewInterfaceErrorUnauth(err.Error()))
+	}
+
 	imageString := mysql.NewNullString(request.Image)
 	hash := hash.HashAndSalt([]byte(request.Password))
 
 	user := domain.User{
-		UserId:   0,
-		Id:       request.Id,
+		Id:       0,
+		UserId:   request.UserId,
 		Username: request.Username,
 		Password: hash,
 		Email:    request.Email,
 		Image:    imageString,
 		Role: domain.Role{
-			Id: request.RoleId,
+			RoleId: request.RoleId,
 		},
 		CreatedAt: time.Now().UnixMilli(),
 		UpdatedAt: &mysql.NullInt{},
 	}
 
+	role, err := service.RoleRepo.FindByName(ctx, tx, "user")
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
+
+	user.Role.RoleId = role.RoleId
+
 	user = service.UserRepo.Save(ctx, tx, user)
-	user, err = service.UserRepo.FindId(ctx, tx, user.UserId)
-	helper.PanicIfError(err)
+	user, err = service.UserRepo.FindId(ctx, tx, user.Id)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
 
 	tokenString := helper.JwtGen(user)
 	userResponseLogin := helper.ToLoginResponse(user)
@@ -80,7 +97,7 @@ func (service *AuthServiceImpl) Update(ctx context.Context, request web.UserUpda
 		panic(exception.NewValidationError(errors))
 	}
 
-	user, err := service.UserRepo.FindById(ctx, tx, request.Id)
+	user, err := service.UserRepo.FindById(ctx, tx, request.UserId)
 	if err != nil {
 		panic(exception.NewInterfaceError(err.Error()))
 	}
@@ -91,7 +108,7 @@ func (service *AuthServiceImpl) Update(ctx context.Context, request web.UserUpda
 	user.Username = request.Username
 	user.Email = request.Email
 	user.Image = imageString
-	user.Role.Id = request.RoleId
+	user.Role.RoleId = request.RoleId
 	user.UpdatedAt = updateInt
 
 	user = service.UserRepo.Update(ctx, tx, user)
@@ -139,6 +156,7 @@ func (service *AuthServiceImpl) Login(ctx context.Context, request web.Login) we
 	}
 
 	UserResponse, _ := service.UserRepo.Login(ctx, tx, userReq)
+	log.Println(UserResponse)
 
 	err = hash.ComparePassword(UserResponse.Password, []byte(request.Password))
 	if err != nil {
@@ -169,7 +187,7 @@ func (service *AuthServiceImpl) SaveMany(ctx context.Context, request []web.User
 		user.Password = hash
 		user.Email = req.Email
 		user.Image = imageString
-		user.Role.Id = req.RoleId
+		user.Role.RoleId = req.RoleId
 		user.CreatedAt = time.Now().UnixMilli()
 
 		users = append(users, user)

@@ -57,13 +57,13 @@ func ToCategoryResponses(categories []domain.Category) []web.CategoryResponse {
 
 func ToUserResponse(user domain.User) web.UserResponse {
 	return web.UserResponse{
-		Id:       user.Id,
+		UserId:   user.UserId,
 		Username: user.Username,
 		Email:    user.Email,
 		Image:    user.Image,
 		Role: &web.RoleResponse{
-			Id:   user.Role.Id,
-			Name: user.Role.Name,
+			RoleId: user.Role.RoleId,
+			Name:   user.Role.Name,
 		},
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
@@ -82,7 +82,7 @@ func ToUserResponses(users []domain.User) []web.UserResponse {
 
 func ToRoleResponse(role domain.Role) web.RoleResponse {
 	return web.RoleResponse{
-		Id:        role.Id,
+		RoleId:    role.RoleId,
 		Name:      role.Name,
 		CreatedAt: role.CreatedAt,
 		UpdatedAt: role.UpdatedAt,
@@ -102,13 +102,13 @@ func ToRoleResponses(roles []domain.Role) []web.RoleResponse {
 func ToLoginResponse(user domain.User) web.LoginResponse {
 	return web.LoginResponse{
 		User: &web.UserResponse{
-			Id:       user.Id,
+			UserId:   user.UserId,
 			Username: user.Username,
 			Email:    user.Email,
 			Image:    user.Image,
 			Role: &web.RoleResponse{
-				Id:   user.Role.Id,
-				Name: user.Role.Name,
+				RoleId: user.Role.RoleId,
+				Name:   user.Role.Name,
 			},
 		},
 	}

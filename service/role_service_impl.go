@@ -62,7 +62,7 @@ func (service *RoleServiceImpl) Update(ctx context.Context, request web.RoleUpda
 		panic(exception.NewValidationError(errors))
 	}
 
-	role, err := service.RoleRepo.FindById(ctx, tx, request.Id)
+	role, err := service.RoleRepo.FindById(ctx, tx, request.RoleId)
 	if err != nil {
 		panic(exception.NewInterfaceError(err.Error()))
 	}
