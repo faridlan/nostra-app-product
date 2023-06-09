@@ -24,14 +24,14 @@ func (repository *CategoryRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, 
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
-	category.CateogoryId = int(id)
+	category.Id = int(id)
 
 	return category
 }
 
 func (repository *CategoryRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, category domain.Category) domain.Category {
 	SQL := "UPDATE categories SET name = ?, updated_at = ? WHERE REPLACE(BIN_TO_UUID(category_id), '-', '') = ?"
-	_, err := tx.ExecContext(ctx, SQL, category.Name, category.UpdatedAt, category.Id)
+	_, err := tx.ExecContext(ctx, SQL, category.Name, category.UpdatedAt, category.CategoryId)
 	helper.PanicIfError(err)
 
 	return category
@@ -39,7 +39,7 @@ func (repository *CategoryRepositoryImpl) Update(ctx context.Context, tx *sql.Tx
 
 func (repository *CategoryRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, category domain.Category) {
 	SQL := "DELETE FROM categories WHERE REPLACE(BIN_TO_UUID(category_id), '-', '') = ?"
-	_, err := tx.ExecContext(ctx, SQL, category.Id)
+	_, err := tx.ExecContext(ctx, SQL, category.CategoryId)
 	helper.PanicIfError(err)
 
 }
@@ -53,7 +53,7 @@ func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.
 
 	category := domain.Category{}
 	if rows.Next() {
-		err := rows.Scan(&category.Id, &category.Name, &category.CreatedAt, &category.UpdatedAt)
+		err := rows.Scan(&category.CategoryId, &category.Name, &category.CreatedAt, &category.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return category, nil
@@ -72,7 +72,7 @@ func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.T
 	categories := []domain.Category{}
 	for rows.Next() {
 		category := domain.Category{}
-		err := rows.Scan(&category.Id, &category.Name, &category.CreatedAt, &category.UpdatedAt)
+		err := rows.Scan(&category.CategoryId, &category.Name, &category.CreatedAt, &category.UpdatedAt)
 		helper.PanicIfError(err)
 
 		categories = append(categories, category)
@@ -90,7 +90,7 @@ func (repository *CategoryRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx
 
 	category := domain.Category{}
 	if rows.Next() {
-		err := rows.Scan(&category.Id, &category.Name, &category.CreatedAt, &category.UpdatedAt)
+		err := rows.Scan(&category.CategoryId, &category.Name, &category.CreatedAt, &category.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return category, nil
@@ -114,7 +114,7 @@ func (repository *CategoryRepositoryImpl) SaveMany(ctx context.Context, tx *sql.
 		id, err := result.LastInsertId()
 		helper.PanicIfError(err)
 
-		category.CateogoryId = int(id)
+		category.Id = int(id)
 	}
 
 	return categories

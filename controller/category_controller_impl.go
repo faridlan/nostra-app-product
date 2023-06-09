@@ -45,7 +45,7 @@ func (controller *CategoryControllerImpl) Update(writer http.ResponseWriter, req
 	helper.ReadFromRequestBody(request, &categoryUpdateReq)
 	id := params.ByName("categoryId")
 
-	categoryUpdateReq.Id = id
+	categoryUpdateReq.CategoryId = id
 
 	category := controller.CategoryService.Update(request.Context(), categoryUpdateReq)
 

@@ -47,7 +47,7 @@ func (controller *ProductControllerImpl) Update(writer http.ResponseWriter, requ
 	helper.ReadFromRequestBody(request, &productUpdate)
 
 	id := params.ByName("productId")
-	productUpdate.Id = id
+	productUpdate.ProductId = id
 
 	product := controller.ProductService.Update(request.Context(), productUpdate)
 

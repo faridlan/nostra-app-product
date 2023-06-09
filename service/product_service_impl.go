@@ -48,13 +48,13 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 		Description: request.Description,
 		Image:       imageString,
 		Category: domain.Category{
-			Id: request.CategoryId,
+			CategoryId: request.CategoryId,
 		},
 		CreatedAt: time.Now().UnixMilli(),
 	}
 
 	productResult := service.ProductRepo.Save(ctx, tx, product)
-	productResult, err = service.ProductRepo.FindId(ctx, tx, productResult.ProductId)
+	productResult, err = service.ProductRepo.FindId(ctx, tx, productResult.Id)
 	helper.PanicIfError(err)
 
 	return helper.ToProductResponse(productResult)
@@ -74,7 +74,7 @@ func (service *ProductServiceImpl) Update(ctx context.Context, request web.Produ
 	imageString := mysql.NewNullString(request.Image)
 	upddateInt := mysql.NewNullInt64(time.Now().UnixMilli())
 
-	product, err := service.ProductRepo.FindById(ctx, tx, request.Id)
+	product, err := service.ProductRepo.FindById(ctx, tx, request.ProductId)
 	if err != nil {
 		panic(exception.NewInterfaceError(err.Error()))
 	}
@@ -84,7 +84,7 @@ func (service *ProductServiceImpl) Update(ctx context.Context, request web.Produ
 	product.Quantity = request.Quantity
 	product.Description = request.Description
 	product.Image = imageString
-	product.Category.Id = request.CategoryId
+	product.Category.CategoryId = request.CategoryId
 	product.UpdatedAt = upddateInt
 
 	productResult := service.ProductRepo.Update(ctx, tx, product)
@@ -145,7 +145,7 @@ func (service *ProductServiceImpl) CreateMany(ctx context.Context, request []web
 		product.Quantity = req.Quantity
 		product.Description = req.Description
 		product.Image = imageString
-		product.Category.Id = req.CategoryId
+		product.Category.CategoryId = req.CategoryId
 		product.CreatedAt = time.Now().UnixMilli()
 
 		products = append(products, product)

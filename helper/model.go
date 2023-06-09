@@ -8,15 +8,15 @@ import (
 func ToProductResponse(product domain.Product) web.ProductResponse {
 
 	return web.ProductResponse{
-		Id:          product.Id,
+		ProductId:   product.ProductId,
 		Name:        product.Name,
 		Price:       product.Price,
 		Quantity:    product.Quantity,
 		Description: product.Description,
 		Image:       product.Image,
 		Category: &web.CategoryResponse{
-			Id:   product.Category.Id,
-			Name: product.Category.Name,
+			CategoryId: product.Category.CategoryId,
+			Name:       product.Category.Name,
 		},
 		CreatedAt: product.CreatedAt,
 		UpdatedAt: product.UpdatedAt,
@@ -36,10 +36,10 @@ func ToProductResponses(products []domain.Product) []web.ProductResponse {
 
 func ToCategoryResponse(category domain.Category) web.CategoryResponse {
 	return web.CategoryResponse{
-		Id:        category.Id,
-		Name:      category.Name,
-		CreatedAt: category.CreatedAt,
-		UpdatedAt: category.UpdatedAt,
+		CategoryId: category.CategoryId,
+		Name:       category.Name,
+		CreatedAt:  category.CreatedAt,
+		UpdatedAt:  category.UpdatedAt,
 	}
 }
 

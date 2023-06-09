@@ -18,20 +18,20 @@ func NewProductRepository() ProductRepository {
 
 func (repository *ProductRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, product domain.Product) domain.Product {
 	SQL := "INSERT INTO products(product_id, name, price, quantity, description, image, category_id, created_at) values (UUID_TO_BIN(UUID()),?,?,?,?,?,UUID_TO_BIN(?),?)"
-	result, err := tx.ExecContext(ctx, SQL, product.Name, product.Price, product.Quantity, product.Description, product.Image, product.Category.Id, product.CreatedAt)
+	result, err := tx.ExecContext(ctx, SQL, product.Name, product.Price, product.Quantity, product.Description, product.Image, product.Category.CategoryId, product.CreatedAt)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
-	product.ProductId = int(id)
+	product.Id = int(id)
 
 	return product
 }
 
 func (repository *ProductRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, product domain.Product) domain.Product {
 	SQL := "UPDATE products SET name = ?, price = ?, quantity = ?, description = ?, image = ?, category_id = UUID_TO_BIN(?), updated_at = ? WHERE REPLACE(BIN_TO_UUID(product_id), '-', '') = ?"
-	_, err := tx.ExecContext(ctx, SQL, product.Name, product.Price, product.Quantity, product.Description, product.Image, product.Category.Id, product.UpdatedAt, product.Id)
+	_, err := tx.ExecContext(ctx, SQL, product.Name, product.Price, product.Quantity, product.Description, product.Image, product.Category.CategoryId, product.UpdatedAt, product.ProductId)
 	helper.PanicIfError(err)
 
 	return product
@@ -39,7 +39,7 @@ func (repository *ProductRepositoryImpl) Update(ctx context.Context, tx *sql.Tx,
 
 func (repository *ProductRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, product domain.Product) {
 	SQL := "DELETE products WHERE REPLACE(BIN_TO_UUID(product_id), '-', '') = ?"
-	_, err := tx.ExecContext(ctx, SQL, product.Id)
+	_, err := tx.ExecContext(ctx, SQL, product.ProductId)
 	helper.PanicIfError(err)
 }
 func (repository *ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId string) (domain.Product, error) {
@@ -57,7 +57,7 @@ func (repository *ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 	product := domain.Product{}
 
 	if rows.Next() {
-		err := rows.Scan(&product.Id, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.Id, &product.Category.Name, &product.CreatedAt, &product.UpdatedAt)
+		err := rows.Scan(&product.ProductId, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.CategoryId, &product.Category.Name, &product.CreatedAt, &product.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return product, nil
@@ -81,7 +81,7 @@ func (repository *ProductRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx,
 	product := domain.Product{}
 
 	if rows.Next() {
-		err := rows.Scan(&product.Id, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.Id, &product.Category.Name, &product.CreatedAt, &product.UpdatedAt)
+		err := rows.Scan(&product.ProductId, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.CategoryId, &product.Category.Name, &product.CreatedAt, &product.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return product, nil
@@ -105,7 +105,7 @@ func (repository *ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx
 
 	for rows.Next() {
 		product := domain.Product{}
-		err := rows.Scan(&product.Id, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.Id, &product.Category.Name, &product.CreatedAt, &product.UpdatedAt)
+		err := rows.Scan(&product.ProductId, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.CategoryId, &product.Category.Name, &product.CreatedAt, &product.UpdatedAt)
 		helper.PanicIfError(err)
 
 		products = append(products, product)
@@ -123,13 +123,13 @@ func (repository *ProductRepositoryImpl) SaveMany(ctx context.Context, tx *sql.T
 	defer stmt.Close()
 
 	for _, product := range products {
-		result, err := stmt.ExecContext(ctx, product.Name, product.Price, product.Quantity, product.Description, product.Image, product.Category.Id, product.CreatedAt)
+		result, err := stmt.ExecContext(ctx, product.Name, product.Price, product.Quantity, product.Description, product.Image, product.Category.CategoryId, product.CreatedAt)
 		helper.PanicIfError(err)
 
 		id, err := result.LastInsertId()
 		helper.PanicIfError(err)
 
-		product.ProductId = int(id)
+		product.Id = int(id)
 	}
 
 	return products

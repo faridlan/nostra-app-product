@@ -5,8 +5,8 @@ import (
 )
 
 type Product struct {
-	ProductId   int
-	Id          string
+	Id          int
+	ProductId   string
 	Name        string
 	Price       int
 	Quantity    int

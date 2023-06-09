@@ -46,7 +46,7 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request web.Cate
 
 	categoryResult := service.CategoryRepo.Save(ctx, tx, cateogry)
 
-	categoryResult, err = service.CategoryRepo.FindId(ctx, tx, categoryResult.CateogoryId)
+	categoryResult, err = service.CategoryRepo.FindId(ctx, tx, categoryResult.Id)
 	if err != nil {
 		panic(exception.NewInterfaceError(err.Error()))
 	}
@@ -67,7 +67,7 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request web.Cate
 
 	updateAt := mysql.NewNullInt64(time.Now().UnixMilli())
 
-	category, err := service.CategoryRepo.FindById(ctx, tx, request.Id)
+	category, err := service.CategoryRepo.FindById(ctx, tx, request.CategoryId)
 	if err != nil {
 		panic(exception.NewInterfaceError(err.Error()))
 	}
