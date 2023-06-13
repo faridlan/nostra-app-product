@@ -131,7 +131,7 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 }
 
 func (repository *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
-	SQL := `SELECT REPLACE(BIN_TO_UUID(u.user_id), '-', '') as user_id, u.username, u.password, u.email, u.image, REPLACE(BIN_TO_UUID(r.role_id), '-', '') as role_id, r.name
+	SQL := `SELECT REPLACE(BIN_TO_UUID(u.user_id), '-', '') as user_id, u.username, u.password, u.email, u.image, REPLACE(BIN_TO_UUID(r.role_id), '-', '') as role_id, r.name, r.created_at, r.updated_at, u.created_at, u.updated_at
 	FROM users AS u 
 	INNER JOIN roles AS r ON (r.role_id = u.role_id)
 	WHERE u.username = ?`
@@ -144,7 +144,7 @@ func (repository *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, use
 	userModel := domain.User{}
 
 	if rows.Next() {
-		err := rows.Scan(&userModel.UserId, &userModel.Username, &userModel.Password, &userModel.Email, &userModel.Image, &userModel.Role.RoleId, &userModel.Role.Name)
+		err := rows.Scan(&userModel.UserId, &userModel.Username, &userModel.Password, &userModel.Email, &userModel.Image, &userModel.Role.RoleId, &userModel.Role.Name, &userModel.Role.CreatedAt, &userModel.Role.UpdatedAt, &userModel.CreatedAt, &userModel.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return userModel, nil
