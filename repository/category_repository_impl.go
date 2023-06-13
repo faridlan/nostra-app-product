@@ -63,7 +63,7 @@ func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.
 }
 
 func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Category {
-	SQL := "SELECT REPLACE(BIN_TO_UUID(category_id), '-', ''), name,created_at, updated_at FROM categories ORDER BY p.created_at DESC"
+	SQL := "SELECT REPLACE(BIN_TO_UUID(category_id), '-', ''), name,created_at, updated_at FROM categories ORDER BY created_at DESC"
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 
