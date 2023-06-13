@@ -94,7 +94,8 @@ func (repository *ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx
 	SQL := `SELECT REPLACE (BIN_TO_UUID(p.product_id),'-','') AS id, p.name, p.price, p.quantity, p.description, p.image,
 					REPLACE (BIN_TO_UUID(c.category_id), '-', '') AS category_id, c.name, c.created_at, c.updated_at, p.created_at, p.updated_at
 					FROM products AS p
-					INNER JOIN categories AS c ON (c.category_id = p.category_id);`
+					INNER JOIN categories AS c ON (c.category_id = p.category_id)
+					ORDER BY p.created_at DESC`
 
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
