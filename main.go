@@ -46,7 +46,7 @@ func main() {
 	router.PUT("/api/users/:userId", userController.Update)
 	router.GET("/api/users", userController.FindAll)
 	router.POST("/api/users/image", userController.UploadIamge)
-	router.GET("/api/users/:userId", userController.FindById)
+	router.GET("/api/users/profile/:userId", userController.FindById)
 	router.GET("/api/users/profile", userController.Profile)
 
 	//auth user
@@ -71,11 +71,11 @@ func main() {
 	categoryController := controller.NewCategoryController(categoryService)
 
 	//CRUD
-	router.POST("/api/products/categories", categoryController.Create)
-	router.PUT("/api/products/categories/:categoryId", categoryController.Update)
+	router.POST("/api/categories", categoryController.Create)
+	router.PUT("/api/categories/:categoryId", categoryController.Update)
 	// router.DELETE("/api/categories/:categoryId", categoryController.Delete)
-	router.GET("/api/products/categories/:categoryId", categoryController.FindById)
-	router.GET("/api/products/categories", categoryController.FindAll)
+	router.GET("/api/categories/:categoryId", categoryController.FindById)
+	router.GET("/api/categories", categoryController.FindAll)
 
 	//SEEDER
 	seederService := service.NewSeederService(db, roleRepository, userRepository, categoryRepository, productRepository)
