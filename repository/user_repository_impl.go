@@ -41,7 +41,7 @@ func (repository *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, us
 }
 
 func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userId string) (domain.User, error) {
-	SQL := `SELECT REPLACE(BIN_TO_UUID(u.user_id), '-', '') as user_id, u.username, u.email, u.image, REPLACE(BIN_TO_UUID(r.role_id), '-', '') as role_id, r.name , u.created_at, u.updated_at 
+	SQL := `SELECT REPLACE(BIN_TO_UUID(u.user_id), '-', '') as user_id, u.username, u.email, u.image, REPLACE(BIN_TO_UUID(r.role_id), '-', '') as role_id, r.name, r.created_at, r.updated_at, u.created_at, u.updated_at 
 	FROM users AS u 
 	INNER JOIN roles AS r ON (r.role_id = u.role_id)
 	WHERE REPLACE(BIN_TO_UUID(user_id), '-', '') = ?`
@@ -54,7 +54,7 @@ func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 	user := domain.User{}
 
 	if rows.Next() {
-		err := rows.Scan(&user.UserId, &user.Username, &user.Email, &user.Image, &user.Role.RoleId, &user.Role.Name, &user.CreatedAt, &user.UpdatedAt)
+		err := rows.Scan(&user.UserId, &user.Username, &user.Email, &user.Image, &user.Role.RoleId, &user.Role.Name, &user.Role.CreatedAt, &user.Role.UpdatedAt, &user.CreatedAt, &user.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return user, nil
@@ -64,7 +64,7 @@ func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *UserRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx, userId int) (domain.User, error) {
-	SQL := `SELECT REPLACE(BIN_TO_UUID(u.user_id), '-', '') as user_id, u.username, u.email, u.image, REPLACE(BIN_TO_UUID(r.role_id), '-', '') as role_id, r.name , u.created_at, u.updated_at 
+	SQL := `SELECT REPLACE(BIN_TO_UUID(u.user_id), '-', '') as user_id, u.username, u.email, u.image, REPLACE(BIN_TO_UUID(r.role_id), '-', '') as role_id, r.name ,r.created_at, r.updated_at, u.created_at, u.updated_at 
 	FROM users AS u 
 	INNER JOIN roles AS r ON (r.role_id = u.role_id)
 	WHERE u.id = ?`
@@ -77,7 +77,7 @@ func (repository *UserRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx, us
 	user := domain.User{}
 
 	if rows.Next() {
-		err := rows.Scan(&user.UserId, &user.Username, &user.Email, &user.Image, &user.Role.RoleId, &user.Role.Name, &user.CreatedAt, &user.UpdatedAt)
+		err := rows.Scan(&user.UserId, &user.Username, &user.Email, &user.Image, &user.Role.RoleId, &user.Role.Name, &user.Role.CreatedAt, &user.Role.UpdatedAt, &user.CreatedAt, &user.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return user, nil
@@ -106,7 +106,7 @@ func (repository *UserRepositoryImpl) FindName(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.User {
-	SQL := `SELECT REPLACE(BIN_TO_UUID(u.user_id), '-', '') as user_id, u.username, u.email, u.image, REPLACE(BIN_TO_UUID(r.role_id), '-', '') as role_id, r.name , u.created_at, u.updated_at 
+	SQL := `SELECT REPLACE(BIN_TO_UUID(u.user_id), '-', '') as user_id, u.username, u.email, u.image, REPLACE(BIN_TO_UUID(r.role_id), '-', '') as role_id, r.name, r.created_at, r.updated_at, u.created_at, u.updated_at 
 	FROM users AS u 
 	INNER JOIN roles AS r ON (r.role_id = u.role_id)`
 
@@ -119,7 +119,7 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 
 	for rows.Next() {
 		user := domain.User{}
-		err := rows.Scan(&user.UserId, &user.Username, &user.Email, &user.Image, &user.Role.RoleId, &user.Role.Name, &user.CreatedAt, &user.UpdatedAt)
+		err := rows.Scan(&user.UserId, &user.Username, &user.Email, &user.Image, &user.Role.RoleId, &user.Role.Name, &user.Role.CreatedAt, &user.Role.UpdatedAt, &user.CreatedAt, &user.UpdatedAt)
 		helper.PanicIfError(err)
 
 		users = append(users, user)

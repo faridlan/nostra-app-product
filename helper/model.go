@@ -62,8 +62,10 @@ func ToUserResponse(user domain.User) web.UserResponse {
 		Email:    user.Email,
 		Image:    user.Image,
 		Role: &web.RoleResponse{
-			RoleId: user.Role.RoleId,
-			Name:   user.Role.Name,
+			RoleId:    user.Role.RoleId,
+			Name:      user.Role.Name,
+			CreatedAt: user.Role.CreatedAt,
+			UpdatedAt: user.Role.UpdatedAt,
 		},
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
@@ -107,9 +109,13 @@ func ToLoginResponse(user domain.User) web.LoginResponse {
 			Email:    user.Email,
 			Image:    user.Image,
 			Role: &web.RoleResponse{
-				RoleId: user.Role.RoleId,
-				Name:   user.Role.Name,
+				RoleId:    user.Role.RoleId,
+				Name:      user.Role.Name,
+				CreatedAt: user.Role.CreatedAt,
+				UpdatedAt: user.Role.UpdatedAt,
 			},
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
 		},
 	}
 }
