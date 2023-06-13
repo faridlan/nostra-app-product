@@ -44,7 +44,7 @@ func (repository *ProductRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx,
 }
 func (repository *ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId string) (domain.Product, error) {
 	SQL := `SELECT REPLACE (BIN_TO_UUID(p.product_id),'-','') AS id, p.name, p.price, p.quantity, p.description, p.image,
-	REPLACE (BIN_TO_UUID(c.category_id), '-', '') AS category_id, c.name, p.created_at, p.updated_at
+	REPLACE (BIN_TO_UUID(c.category_id), '-', '') AS category_id, c.name, c.created_at, c.updated_at, p.created_at, p.updated_at
 	FROM products AS p 
 	INNER JOIN categories AS c ON (c.category_id = p.category_id)
 	WHERE REPLACE(BIN_TO_UUID(p.product_id), '-', '') = ?`
@@ -57,7 +57,7 @@ func (repository *ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 	product := domain.Product{}
 
 	if rows.Next() {
-		err := rows.Scan(&product.ProductId, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.CategoryId, &product.Category.Name, &product.CreatedAt, &product.UpdatedAt)
+		err := rows.Scan(&product.ProductId, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.CategoryId, &product.Category.Name, &product.Category.CreatedAt, &product.Category.UpdatedAt, &product.CreatedAt, &product.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return product, nil
@@ -68,7 +68,7 @@ func (repository *ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 
 func (repository *ProductRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx, productId int) (domain.Product, error) {
 	SQL := `SELECT REPLACE (BIN_TO_UUID(p.product_id),'-','') AS id, p.name, p.price, p.quantity, p.description, p.image,
-	REPLACE (BIN_TO_UUID(c.category_id), '-', '') AS category_id, c.name, p.created_at, p.updated_at
+	REPLACE (BIN_TO_UUID(c.category_id), '-', '') AS category_id, c.name, c.created_at, c.updated_at, p.created_at, p.updated_at
 	FROM products AS p 
 	INNER JOIN categories AS c ON (c.category_id = p.category_id)
 	WHERE p.id = ?`
@@ -81,7 +81,7 @@ func (repository *ProductRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx,
 	product := domain.Product{}
 
 	if rows.Next() {
-		err := rows.Scan(&product.ProductId, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.CategoryId, &product.Category.Name, &product.CreatedAt, &product.UpdatedAt)
+		err := rows.Scan(&product.ProductId, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.CategoryId, &product.Category.Name, &product.Category.CreatedAt, &product.Category.UpdatedAt, &product.CreatedAt, &product.UpdatedAt)
 		helper.PanicIfError(err)
 
 		return product, nil
@@ -92,7 +92,7 @@ func (repository *ProductRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx,
 
 func (repository *ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Product {
 	SQL := `SELECT REPLACE (BIN_TO_UUID(p.product_id),'-','') AS id, p.name, p.price, p.quantity, p.description, p.image,
-					REPLACE (BIN_TO_UUID(c.category_id), '-', '') AS category_id, c.name, p.created_at, p.updated_at
+					REPLACE (BIN_TO_UUID(c.category_id), '-', '') AS category_id, c.name, c.created_at, c.updated_at, p.created_at, p.updated_at
 					FROM products AS p
 					INNER JOIN categories AS c ON (c.category_id = p.category_id);`
 
@@ -105,7 +105,7 @@ func (repository *ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx
 
 	for rows.Next() {
 		product := domain.Product{}
-		err := rows.Scan(&product.ProductId, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.CategoryId, &product.Category.Name, &product.CreatedAt, &product.UpdatedAt)
+		err := rows.Scan(&product.ProductId, &product.Name, &product.Price, &product.Quantity, &product.Description, &product.Image, &product.Category.CategoryId, &product.Category.Name, &product.Category.CreatedAt, &product.Category.UpdatedAt, &product.CreatedAt, &product.UpdatedAt)
 		helper.PanicIfError(err)
 
 		products = append(products, product)
