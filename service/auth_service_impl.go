@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"database/sql"
-	"log"
 	"time"
 
 	"github.com/faridlan/nostra-api-product/exception"
@@ -156,7 +155,7 @@ func (service *AuthServiceImpl) Login(ctx context.Context, request web.Login) we
 	}
 
 	UserResponse, _ := service.UserRepo.Login(ctx, tx, userReq)
-	log.Println(UserResponse)
+	// log.Println(UserResponse)
 
 	err = hash.ComparePassword(UserResponse.Password, []byte(request.Password))
 	if err != nil {
