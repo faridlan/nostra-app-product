@@ -57,7 +57,7 @@ func (repository *RoleRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *RoleRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Role {
-	SQL := "SELECT REPLACE(BIN_TO_UUID(role_id), '-', '') as role_id, name, created_at, updated_at FROM roles ORDER BY p.created_at DESC"
+	SQL := "SELECT REPLACE(BIN_TO_UUID(role_id), '-', '') as role_id, name, created_at, updated_at FROM roles ORDER BY created_at DESC"
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 

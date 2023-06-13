@@ -109,7 +109,7 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 	SQL := `SELECT REPLACE(BIN_TO_UUID(u.user_id), '-', '') as user_id, u.username, u.email, u.image, REPLACE(BIN_TO_UUID(r.role_id), '-', '') as role_id, r.name, r.created_at, r.updated_at, u.created_at, u.updated_at 
 	FROM users AS u 
 	INNER JOIN roles AS r ON (r.role_id = u.role_id)
-	ORDER BY p.created_at DESC`
+	ORDER BY u.created_at DESC`
 
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
