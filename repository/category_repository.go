@@ -14,6 +14,7 @@ type CategoryRepository interface {
 	FindById(ctx context.Context, tx *sql.Tx, categoryId string) (domain.Category, error)
 	FindAll(ctx context.Context, tx *sql.Tx) []domain.Category
 	FindId(ctx context.Context, tx *sql.Tx, categoryId int) (domain.Category, error)
+	FindByName(ctx context.Context, tx *sql.Tx, categoryName string) (domain.Category, error)
 	SaveMany(ctx context.Context, tx *sql.Tx, categories []domain.Category) []domain.Category
 	DeleteAll(ctx context.Context, tx *sql.Tx)
 }

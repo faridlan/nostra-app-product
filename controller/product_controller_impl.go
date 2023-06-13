@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"embed"
-	"encoding/json"
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/helper"
@@ -10,10 +8,6 @@ import (
 	"github.com/faridlan/nostra-api-product/service"
 	"github.com/julienschmidt/httprouter"
 )
-
-//go:embed json/products.json
-
-var Json embed.FS
 
 type ProductControllerImpl struct {
 	ProductService service.ProductService
@@ -94,35 +88,6 @@ func (controller *ProductControllerImpl) FindAll(writer http.ResponseWriter, req
 		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   products,
-	}
-
-	helper.WriteToResponseBody(writer, webResponse)
-}
-
-func (controller *ProductControllerImpl) SeederCreate(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	products, err := Json.ReadFile("json/products.json")
-	helper.PanicIfError(err)
-
-	productCreate := []web.ProductCreateReq{}
-	json.Unmarshal(products, &productCreate)
-
-	product := controller.ProductService.CreateMany(request.Context(), productCreate)
-
-	webResponse := web.WebResponse{
-		Code:   http.StatusOK,
-		Status: "OK",
-		Data:   product,
-	}
-
-	helper.WriteToResponseBody(writer, webResponse)
-}
-
-func (controller *ProductControllerImpl) SeederDelete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	controller.ProductService.DeleteAll(request.Context())
-
-	webResponse := web.WebResponse{
-		Code:   http.StatusOK,
-		Status: "OK",
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

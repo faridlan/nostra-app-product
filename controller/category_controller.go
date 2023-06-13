@@ -12,6 +12,4 @@ type CategoryController interface {
 	Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
-	SeederCreate(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
-	SeederDelete(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }

@@ -1,10 +1,10 @@
 [
   {
-    "name": "guest",
+    "name": "admin",
     "created_at": 1683647933367
   },
   {
-    "name": "traine",
+    "name": "user",
     "created_at": 1683647933367
   },
   {

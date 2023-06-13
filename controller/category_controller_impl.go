@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"embed"
-	"encoding/json"
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/helper"
@@ -10,10 +8,6 @@ import (
 	"github.com/faridlan/nostra-api-product/service"
 	"github.com/julienschmidt/httprouter"
 )
-
-//go:embed json/categories.json
-
-var JsonCategories embed.FS
 
 type CategoryControllerImpl struct {
 	CategoryService service.CategoryService
@@ -93,35 +87,6 @@ func (controller *CategoryControllerImpl) FindAll(writer http.ResponseWriter, re
 		Code:   200,
 		Status: "OK",
 		Data:   categories,
-	}
-
-	helper.WriteToResponseBody(writer, webResponse)
-}
-
-func (controller *CategoryControllerImpl) SeederCreate(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	categories, err := JsonCategories.ReadFile("json/categories.json")
-	helper.PanicIfError(err)
-
-	categoriesCreate := []web.CategoryCreateReq{}
-	json.Unmarshal(categories, &categoriesCreate)
-
-	category := controller.CategoryService.CreateMany(request.Context(), categoriesCreate)
-
-	webResponse := web.WebResponse{
-		Code:   http.StatusOK,
-		Status: "OK",
-		Data:   category,
-	}
-
-	helper.WriteToResponseBody(writer, webResponse)
-}
-
-func (controller *CategoryControllerImpl) SeederDelete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	controller.CategoryService.DeleteAll(request.Context())
-
-	webResponse := web.WebResponse{
-		Code:   http.StatusOK,
-		Status: "OK",
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

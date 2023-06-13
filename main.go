@@ -30,10 +30,6 @@ func main() {
 	roleService := service.NewRoleService(roleRepository, db, validate)
 	roleController := controller.NewRoleController(roleService)
 
-	//Seeder
-	router.POST("/api/roles/seeder", roleController.SeederCreate)
-	router.DELETE("/api/roles/seeder", roleController.SeederDelete)
-
 	//CRUD
 	router.GET("/api/roles", roleController.FindAll)
 	router.GET("/api/roles/:roleId", roleController.FindById)
@@ -44,10 +40,6 @@ func main() {
 	userRepository := repository.NewUserRepository()
 	userService := service.NewAuthService(userRepository, roleRepository, db, validate)
 	userController := controller.NewAuthController(userService, upload)
-
-	//User Seeder
-	router.POST("/api/users/seeder", userController.CreateMany)
-	router.DELETE("/api/users/seeder", userController.DeleteAll)
 
 	//User CRUD
 	router.POST("/api/users/register", userController.Register)
@@ -73,10 +65,6 @@ func main() {
 	router.GET("/api/products", productController.FindAll)
 	router.POST("/api/products/image", productController.UploadImage)
 
-	//Product Seeder
-	router.POST("/api/products/seeder", productController.SeederCreate)
-	router.DELETE("/api/products/seeder", productController.SeederDelete)
-
 	//Category
 	categoryRepository := repository.NewCategoryRepository()
 	categoryService := service.NewCategoryService(categoryRepository, db, validate)
@@ -89,9 +77,12 @@ func main() {
 	router.GET("/api/categories/:categoryId", categoryController.FindById)
 	router.GET("/api/categories", categoryController.FindAll)
 
-	//Category Seeder
-	router.POST("/api/categories/seeder", categoryController.SeederCreate)
-	router.DELETE("/api/categories/seeder", categoryController.SeederDelete)
+	//SEEDER
+	seederService := service.NewSeederService(db, roleRepository, userRepository, categoryRepository, productRepository)
+	seederController := controller.NewSeederController(seederService)
+
+	router.POST("/api/seeder", seederController.SaveMany)
+	router.DELETE("/api/seeder", seederController.Delete)
 
 	router.PanicHandler = exception.ExceptionError
 

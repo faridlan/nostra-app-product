@@ -34,6 +34,11 @@ func (authMiddleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, requ
 		return
 	}
 
+	if (request.URL.Path == "/api/seeder" && request.Method == "POST") || (request.URL.Path == "/api/seeder" && request.Method == "DELETE") {
+		authMiddleware.Handler.ServeHTTP(writer, request)
+		return
+	}
+
 	if !strings.Contains(authorizationHeader, "Bearer") {
 
 		writer.Header().Add("Content-Type", "application.json")

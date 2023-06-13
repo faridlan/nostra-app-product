@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"embed"
-	"encoding/json"
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/helper"
@@ -23,10 +21,6 @@ func NewAuthController(authService service.AuthService, upload service.UploadS3A
 		Upload:      upload,
 	}
 }
-
-//go:embed json/users.json
-
-var JsonUsers embed.FS
 
 func (controller *AuthControllerImpl) Register(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	userCreate := web.UserCreateReq{}
@@ -112,34 +106,6 @@ func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request 
 	}
 
 	helper.WriteToResponseBody(writer, webRespone)
-}
-
-func (controller *AuthControllerImpl) CreateMany(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	users, err := JsonUsers.ReadFile("json/users.json")
-	helper.PanicIfError(err)
-
-	usersCreate := []web.UserCreateReq{}
-	json.Unmarshal(users, &usersCreate)
-
-	userResponses := controller.AuthService.SaveMany(request.Context(), usersCreate)
-	webResponse := web.WebResponse{
-		Code:   200,
-		Status: "OK",
-		Data:   userResponses,
-	}
-
-	helper.WriteToResponseBody(writer, webResponse)
-}
-
-func (controller *AuthControllerImpl) DeleteAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	controller.AuthService.DeleteAll(request.Context())
-	webResponse := web.WebResponse{
-		Code:   200,
-		Status: "OK",
-	}
-
-	helper.WriteToResponseBody(writer, webResponse)
-
 }
 
 func (controller *AuthControllerImpl) UploadIamge(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {

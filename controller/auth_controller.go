@@ -13,7 +13,5 @@ type AuthController interface {
 	Profile(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
-	CreateMany(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
-	DeleteAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	UploadIamge(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }

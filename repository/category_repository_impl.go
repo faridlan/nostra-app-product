@@ -81,6 +81,24 @@ func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.T
 	return categories
 }
 
+func (repository *CategoryRepositoryImpl) FindByName(ctx context.Context, tx *sql.Tx, categoryName string) (domain.Category, error) {
+	SQL := "SELECT REPLACE(BIN_TO_UUID(category_id), '-', ''), name,created_at, updated_at FROM categories WHERE name = ?"
+	rows, err := tx.QueryContext(ctx, SQL, categoryName)
+	helper.PanicIfError(err)
+
+	defer rows.Close()
+
+	category := domain.Category{}
+	if rows.Next() {
+		err := rows.Scan(&category.CategoryId, &category.Name, &category.CreatedAt, &category.UpdatedAt)
+		helper.PanicIfError(err)
+
+		return category, nil
+	} else {
+		return category, errors.New("category not found")
+	}
+}
+
 func (repository *CategoryRepositoryImpl) FindId(ctx context.Context, tx *sql.Tx, categoryId int) (domain.Category, error) {
 	SQL := "SELECT REPLACE(BIN_TO_UUID(category_id), '-', ''), name,created_at, updated_at FROM categories WHERE id = ?"
 	rows, err := tx.QueryContext(ctx, SQL, categoryId)
@@ -121,7 +139,9 @@ func (repository *CategoryRepositoryImpl) SaveMany(ctx context.Context, tx *sql.
 }
 
 func (repository *CategoryRepositoryImpl) DeleteAll(ctx context.Context, tx *sql.Tx) {
-	SQL := "DELETE FROM categories WHERE created_at != 1682954749732;"
+	// SQL := "DELETE FROM categories WHERE created_at != 1682954749732;"
+	// SQL := "TRUNCATE categories"
+	SQL := "DELETE FROM categories"
 	_, err := tx.ExecContext(ctx, SQL)
 	helper.PanicIfError(err)
 }

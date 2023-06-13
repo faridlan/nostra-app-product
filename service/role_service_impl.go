@@ -100,14 +100,14 @@ func (service *RoleServiceImpl) FindAll(ctx context.Context) []web.RoleResponse 
 	return helper.ToRoleResponses(roles)
 }
 
-func (service *RoleServiceImpl) CreateMany(ctx context.Context, requests []web.RoleCreateReq) []web.RoleResponse {
+func (service *RoleServiceImpl) CreateMany(ctx context.Context, request []web.RoleCreateReq) []web.RoleResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
 	roles := []domain.Role{}
 
-	for _, role := range requests {
+	for _, role := range request {
 		roleStruct := domain.Role{}
 		roleStruct.Name = role.Name
 		roleStruct.CreatedAt = time.Now().UnixMilli()

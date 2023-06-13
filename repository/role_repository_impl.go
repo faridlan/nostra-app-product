@@ -116,7 +116,9 @@ func (repository *RoleRepositoryImpl) SaveMany(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *RoleRepositoryImpl) DeleteAll(ctx context.Context, tx *sql.Tx) {
-	SQL := "DELETE FROM roles WHERE created_at != 1683382190182"
+	// SQL := "DELETE FROM roles WHERE created_at != 1683382190182"
+	// SQL := "TRUNCATE roles"
+	SQL := "DELETE FROM roles"
 
 	_, err := tx.ExecContext(ctx, SQL)
 	helper.PanicIfError(err)
