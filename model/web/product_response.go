@@ -8,8 +8,8 @@ type ProductResponse struct {
 	Price       int               `json:"price,omitempty"`
 	Quantity    int               `json:"quantity,omitempty"`
 	Description string            `json:"description,omitempty"`
-	Image       *mysql.NullString `json:"image,omitempty"`
+	Image       *mysql.NullString `json:"image"`
 	Category    *CategoryResponse `json:"category,omitempty"`
 	CreatedAt   int64             `json:"created_at,omitempty"`
-	UpdatedAt   *mysql.NullInt    `json:"updated_at,omitempty"`
+	UpdatedAt   *mysql.NullInt    `json:"updated_at"`
 }
