@@ -52,19 +52,6 @@ func main() {
 	//auth user
 	router.POST("/api/users/login", userController.Login)
 
-	//Product
-	productRepository := repository.NewProductRepository()
-	productService := service.NewProductService(productRepository, db, validate)
-	productController := controller.NewProductController(productService, upload)
-
-	//CRUD
-	router.POST("/api/products", productController.Create)
-	router.PUT("/api/products/:productId", productController.Update)
-	// router.DELETE("/api/products/:productId", productController.Delete)
-	router.GET("/api/products/:productId", productController.FindById)
-	router.GET("/api/products", productController.FindAll)
-	router.POST("/api/products/image", productController.UploadImage)
-
 	//Category
 	categoryRepository := repository.NewCategoryRepository()
 	categoryService := service.NewCategoryService(categoryRepository, db, validate)
@@ -76,6 +63,19 @@ func main() {
 	// router.DELETE("/api/categories/:categoryId", categoryController.Delete)
 	router.GET("/api/categories/:categoryId", categoryController.FindById)
 	router.GET("/api/categories", categoryController.FindAll)
+
+	//Product
+	productRepository := repository.NewProductRepository()
+	productService := service.NewProductService(productRepository, categoryRepository, db, validate)
+	productController := controller.NewProductController(productService, upload)
+
+	//CRUD
+	router.POST("/api/products", productController.Create)
+	router.PUT("/api/products/:productId", productController.Update)
+	// router.DELETE("/api/products/:productId", productController.Delete)
+	router.GET("/api/products/:productId", productController.FindById)
+	router.GET("/api/products", productController.FindAll)
+	router.POST("/api/products/image", productController.UploadImage)
 
 	//SEEDER
 	seederService := service.NewSeederService(db, roleRepository, userRepository, categoryRepository, productRepository)
