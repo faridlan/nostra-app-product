@@ -15,16 +15,18 @@ import (
 )
 
 type ProductServiceImpl struct {
-	ProductRepo repository.ProductRepository
-	DB          *sql.DB
-	Validate    *validator.Validate
+	ProductRepo  repository.ProductRepository
+	CategoryRepo repository.CategoryRepository
+	DB           *sql.DB
+	Validate     *validator.Validate
 }
 
-func NewProductService(productRepo repository.ProductRepository, db *sql.DB, validate *validator.Validate) ProductService {
+func NewProductService(productRepo repository.ProductRepository, categoryRepo repository.CategoryRepository, db *sql.DB, validate *validator.Validate) ProductService {
 	return &ProductServiceImpl{
-		ProductRepo: productRepo,
-		DB:          db,
-		Validate:    validate,
+		ProductRepo:  productRepo,
+		CategoryRepo: categoryRepo,
+		DB:           db,
+		Validate:     validate,
 	}
 }
 
@@ -39,6 +41,11 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 		panic(exception.NewValidationError(errors))
 	}
 
+	category, err := service.CategoryRepo.FindById(ctx, tx, request.CategoryId)
+	if err != nil {
+		panic(exception.NewInterfaceError(err.Error()))
+	}
+
 	imageString := mysql.NewNullString(request.Image)
 
 	product := domain.Product{
@@ -48,7 +55,7 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 		Description: request.Description,
 		Image:       imageString,
 		Category: domain.Category{
-			CategoryId: request.CategoryId,
+			CategoryId: category.CategoryId,
 		},
 		CreatedAt: time.Now().UnixMilli(),
 	}
