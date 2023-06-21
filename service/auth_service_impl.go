@@ -159,7 +159,7 @@ func (service *AuthServiceImpl) Login(ctx context.Context, request web.Login) we
 
 	err = hash.ComparePassword(UserResponse.Password, []byte(request.Password))
 	if err != nil {
-		panic(exception.NewInterfaceErrorUnauth(err.Error()))
+		panic(exception.NewBadRequestError(err.Error()))
 	}
 
 	tokenString := helper.JwtGen(UserResponse)

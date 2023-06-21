@@ -22,6 +22,10 @@ func ExceptionError(writer http.ResponseWriter, request *http.Request, err any) 
 		return
 	}
 
+	if badRequestError(writer, request, err) {
+		return
+	}
+
 	// if badRequestError(writer, request, err) {
 	// 	return
 	// }
@@ -89,6 +93,26 @@ func unauthorizedError(writer http.ResponseWriter, request *http.Request, err an
 
 func validationError(writer http.ResponseWriter, request *http.Request, err any) bool {
 	exception, ok := err.(ValidationError)
+
+	if ok {
+		writer.Header().Add("content-type", "application/json")
+		writer.WriteHeader(http.StatusBadRequest)
+
+		webResponse := web.WebResponse{
+			Code:   http.StatusBadRequest,
+			Status: "BAD REQUEST",
+			Data:   exception.Error,
+		}
+
+		helper.WriteToResponseBody(writer, webResponse)
+		return true
+	} else {
+		return false
+	}
+}
+
+func badRequestError(writer http.ResponseWriter, request *http.Request, err any) bool {
+	exception, ok := err.(BadRequestError)
 
 	if ok {
 		writer.Header().Add("content-type", "application/json")
