@@ -50,6 +50,8 @@ func (controller *SeederControllerImpl) Delete(writer http.ResponseWriter, reque
 
 func (controller *SeederControllerImpl) SaveMany(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
+	controller.SeederService.Delete(request.Context())
+
 	roles, err := JsonEmbed.ReadFile("json/roles.json")
 	helper.PanicIfError(err)
 
