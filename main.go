@@ -48,6 +48,7 @@ func main() {
 	router.POST("/api/users/image", userController.UploadIamge)
 	router.GET("/api/users/profile/:userId", userController.FindById)
 	router.GET("/api/users/profile", userController.Profile)
+	router.GET("/api/users/logout", userController.Logout)
 
 	//auth user
 	router.POST("/api/users/login", userController.Login)

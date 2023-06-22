@@ -14,4 +14,5 @@ type AuthController interface {
 	FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	UploadIamge(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	Logout(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/faridlan/nostra-api-product/helper"
 	"github.com/faridlan/nostra-api-product/helper/auth"
@@ -118,6 +119,19 @@ func (controller *AuthControllerImpl) UploadIamge(writer http.ResponseWriter, re
 		Code:   200,
 		Status: "OK",
 		Data:   uploadResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *AuthControllerImpl) Logout(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	auth := request.Header.Get("Authorization")
+	authString := strings.Replace(auth, "Bearer ", "", -1)
+	controller.AuthService.DeleteWL(request.Context(), authString)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

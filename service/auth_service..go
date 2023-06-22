@@ -14,4 +14,5 @@ type AuthService interface {
 	Login(ctx context.Context, request web.Login) web.LoginResponse
 	SaveMany(ctx context.Context, request []web.UserCreateReq) []web.UserResponse
 	DeleteAll(ctx context.Context)
+	DeleteWL(ctx context.Context, userId string)
 }

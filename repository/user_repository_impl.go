@@ -180,3 +180,25 @@ func (repository *UserRepositoryImpl) DeleteAll(ctx context.Context, tx *sql.Tx)
 	_, err := tx.ExecContext(ctx, SQL)
 	helper.PanicIfError(err)
 }
+
+func (repository *UserRepositoryImpl) SaveWL(ctx context.Context, tx *sql.Tx, whitelist domain.Whitelist) domain.Whitelist {
+	SQL := "INSERT INTO token_whitelist(user_id, token) values (?,?)"
+
+	result, err := tx.ExecContext(ctx, SQL, whitelist.UserId, whitelist.Token)
+	helper.PanicIfError(err)
+
+	id, err := result.LastInsertId()
+	helper.PanicIfError(err)
+
+	whitelist.Id = int(id)
+
+	return whitelist
+}
+
+func (repository *UserRepositoryImpl) DeleteWL(ctx context.Context, tx *sql.Tx, userId string) {
+	SQL := "DELETE FROM token_whitelist WHERE token = ?"
+
+	_, err := tx.ExecContext(ctx, SQL, userId)
+	helper.PanicIfError(err)
+
+}

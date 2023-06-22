@@ -166,6 +166,12 @@ func (service *AuthServiceImpl) Login(ctx context.Context, request web.Login) we
 	userResponseLogin := helper.ToLoginResponse(UserResponse)
 	userResponseLogin.Token = tokenString
 
+	whitelist := domain.Whitelist{
+		UserId: UserResponse.UserId,
+		Token:  tokenString,
+	}
+	service.UserRepo.SaveWL(ctx, tx, whitelist)
+
 	return userResponseLogin
 }
 
@@ -204,4 +210,14 @@ func (service *AuthServiceImpl) DeleteAll(ctx context.Context) {
 	defer helper.CommitOrRollback(tx)
 
 	service.UserRepo.DeleteAll(ctx, tx)
+}
+
+func (service *AuthServiceImpl) DeleteWL(ctx context.Context, userId string) {
+
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	service.UserRepo.DeleteWL(ctx, tx, userId)
+
 }

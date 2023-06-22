@@ -17,4 +17,6 @@ type UserRepository interface {
 	Login(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error)
 	SaveMany(ctx context.Context, tx *sql.Tx, user []domain.User) []domain.User
 	DeleteAll(ctx context.Context, tx *sql.Tx)
+	SaveWL(ctx context.Context, tx *sql.Tx, whitelist domain.Whitelist) domain.Whitelist
+	DeleteWL(ctx context.Context, tx *sql.Tx, userId string)
 }
