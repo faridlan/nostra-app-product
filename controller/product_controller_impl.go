@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/helper"
@@ -31,6 +32,23 @@ func (controller *ProductControllerImpl) Create(writer http.ResponseWriter, requ
 		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   product,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *ProductControllerImpl) CreateMany(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	productsCreate := []web.ProductCreateReq{}
+	helper.ReadFromRequestBody(request, &productsCreate)
+
+	products := controller.ProductService.CreateMany(request.Context(), productsCreate)
+
+	log.Println(products)
+
+	webResponse := web.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   products,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
@@ -102,6 +120,38 @@ func (controller *ProductControllerImpl) UploadImage(writer http.ResponseWriter,
 		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   upload,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *ProductControllerImpl) UploadImageBatch(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	err := request.ParseMultipartForm(10 << 20)
+	if err != nil {
+		panic(err)
+	}
+
+	images := request.MultipartForm.File["productImage"]
+	uploads := []web.UploadResponse{}
+
+	for _, fh := range images {
+		file, err := fh.Open()
+		if err != nil {
+			panic(err)
+		}
+
+		defer file.Close()
+
+		url := controller.UploadService.Upload(file, "products")
+
+		uploads = append(uploads, url)
+	}
+
+	webResponse := web.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   uploads,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

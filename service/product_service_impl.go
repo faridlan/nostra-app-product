@@ -144,22 +144,27 @@ func (service *ProductServiceImpl) CreateMany(ctx context.Context, request []web
 	products := []domain.Product{}
 
 	for _, req := range request {
+
 		product := domain.Product{}
 		imageString := mysql.NewNullString(req.Image)
+
+		category, err := service.CategoryRepo.FindById(ctx, tx, req.CategoryId)
+		if err != nil {
+			panic(exception.NewInterfaceError(err.Error()))
+		}
 
 		product.Name = req.Name
 		product.Price = req.Price
 		product.Quantity = req.Quantity
 		product.Description = req.Description
 		product.Image = imageString
-		product.Category.CategoryId = req.CategoryId
+		product.Category.CategoryId = category.CategoryId
 		product.CreatedAt = time.Now().UnixMilli()
 
 		products = append(products, product)
 	}
 
-	service.ProductRepo.SaveMany(ctx, tx, products)
-	productResponses := service.ProductRepo.FindAll(ctx, tx)
+	productResponses := service.ProductRepo.SaveMany(ctx, tx, products)
 
 	return helper.ToProductResponses(productResponses)
 }

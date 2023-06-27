@@ -71,11 +71,13 @@ func main() {
 
 	//CRUD
 	router.POST("/api/products", productController.Create)
+	router.POST("/api/products/batch", productController.CreateMany)
 	router.PUT("/api/products/:productId", productController.Update)
 	// router.DELETE("/api/products/:productId", productController.Delete)
 	router.GET("/api/products/:productId", productController.FindById)
 	router.GET("/api/products", productController.FindAll)
 	router.POST("/api/products/image", productController.UploadImage)
+	router.POST("/api/products/image/batch", productController.UploadImageBatch)
 
 	//SEEDER
 	seederService := service.NewSeederService(db, roleRepository, userRepository, categoryRepository, productRepository)
