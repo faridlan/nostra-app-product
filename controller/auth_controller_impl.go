@@ -6,6 +6,7 @@ import (
 
 	"github.com/faridlan/nostra-api-product/helper"
 	"github.com/faridlan/nostra-api-product/helper/auth"
+	"github.com/faridlan/nostra-api-product/helper/multipart"
 	"github.com/faridlan/nostra-api-product/model/web"
 	"github.com/faridlan/nostra-api-product/service"
 	"github.com/julienschmidt/httprouter"
@@ -111,7 +112,7 @@ func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request 
 
 func (controller *AuthControllerImpl) UploadIamge(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	file := helper.MultipartForm("userImage", request)
+	file := multipart.MultipartForm("userImage", request)
 
 	uploadResponse := controller.Upload.Upload(file, "users")
 

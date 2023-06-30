@@ -4,7 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/faridlan/nostra-api-product/exception"
 	"github.com/faridlan/nostra-api-product/helper"
+	"github.com/faridlan/nostra-api-product/helper/multipart"
 	"github.com/faridlan/nostra-api-product/model/web"
 	"github.com/faridlan/nostra-api-product/service"
 	"github.com/julienschmidt/httprouter"
@@ -112,7 +114,7 @@ func (controller *ProductControllerImpl) FindAll(writer http.ResponseWriter, req
 }
 
 func (controller *ProductControllerImpl) UploadImage(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	file := helper.MultipartForm("productImage", request)
+	file := multipart.MultipartForm("productImage", request)
 	defer file.Close()
 
 	upload := controller.UploadService.Upload(file, "products")
@@ -129,16 +131,19 @@ func (controller *ProductControllerImpl) UploadImageBatch(writer http.ResponseWr
 
 	err := request.ParseMultipartForm(10 << 20)
 	if err != nil {
-		panic(err)
+		panic(exception.NewBadRequestError(err.Error()))
 	}
 
 	images := request.MultipartForm.File["productImage"]
+	if len(images) == 0 {
+		panic(exception.NewBadRequestError("No Such File"))
+	}
 	uploads := []web.UploadResponse{}
 
 	for _, fh := range images {
 		file, err := fh.Open()
 		if err != nil {
-			panic(err)
+			panic(exception.NewBadRequestError(err.Error()))
 		}
 
 		defer file.Close()
