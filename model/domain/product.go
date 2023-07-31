@@ -11,7 +11,8 @@ type Product struct {
 	Price       int
 	Quantity    int
 	Description string
-	Image       *mysql.NullString
+	ImageSingle *mysql.NullString
+	Image       []string
 	Category    Category
 	CreatedAt   int64
 	UpdatedAt   *mysql.NullInt

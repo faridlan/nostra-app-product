@@ -46,25 +46,57 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 		panic(exception.NewInterfaceError(err.Error()))
 	}
 
-	imageString := mysql.NewNullString(request.Image)
+	// imageString := mysql.NewNullString(request.Image)
 
 	product := domain.Product{
 		Name:        request.Name,
 		Price:       request.Price,
 		Quantity:    request.Quantity,
 		Description: request.Description,
-		Image:       imageString,
+		// Image:       request.Image,
 		Category: domain.Category{
 			CategoryId: category.CategoryId,
 		},
 		CreatedAt: time.Now().UnixMilli(),
 	}
 
-	productResult := service.ProductRepo.Save(ctx, tx, product)
-	productResult, err = service.ProductRepo.FindId(ctx, tx, productResult.Id)
-	helper.PanicIfError(err)
+	if len(request.Image) == 0 {
+		productResult := service.ProductRepo.Save(ctx, tx, product)
+		productResult, err = service.ProductRepo.FindId(ctx, tx, productResult.Id)
+		helper.PanicIfError(err)
 
-	return helper.ToProductResponse(productResult)
+		return helper.ToProductResponse(productResult)
+	} else {
+		productResult := service.ProductRepo.Save(ctx, tx, product)
+
+		images := []domain.ProductImage{}
+
+		for _, req := range request.Image {
+
+			image := domain.ProductImage{}
+
+			image.ProductId = productResult.Id
+			image.ImageUrl = req
+
+			images = append(images, image)
+
+		}
+
+		var imagesResponses []string
+		imagesReponse := service.ProductRepo.SaveImage(ctx, tx, images)
+
+		for _, image := range imagesReponse {
+			imagesResponses = append(imagesResponses, image.ImageUrl)
+		}
+
+		productResult, err = service.ProductRepo.FindId(ctx, tx, productResult.Id)
+		helper.PanicIfError(err)
+
+		productResult.Image = imagesResponses
+
+		return helper.ToProductResponse(productResult)
+	}
+
 }
 
 func (service *ProductServiceImpl) Update(ctx context.Context, request web.ProductUpdateReq) web.ProductResponse {
@@ -78,7 +110,7 @@ func (service *ProductServiceImpl) Update(ctx context.Context, request web.Produ
 		panic(exception.NewValidationError(errors))
 	}
 
-	imageString := mysql.NewNullString(request.Image)
+	// imageString := mysql.NewNullString(request.Image)
 	upddateInt := mysql.NewNullInt64(time.Now().UnixMilli())
 
 	product, err := service.ProductRepo.FindById(ctx, tx, request.ProductId)
@@ -90,13 +122,46 @@ func (service *ProductServiceImpl) Update(ctx context.Context, request web.Produ
 	product.Price = request.Price
 	product.Quantity = request.Quantity
 	product.Description = request.Description
-	product.Image = imageString
+	// product.Image = request.Image
 	product.Category.CategoryId = request.CategoryId
 	product.UpdatedAt = upddateInt
 
-	productResult := service.ProductRepo.Update(ctx, tx, product)
+	if len(request.Image) == 0 {
+		productResult := service.ProductRepo.Update(ctx, tx, product)
+		productResult, err = service.ProductRepo.FindById(ctx, tx, productResult.ProductId)
+		helper.PanicIfError(err)
 
-	return helper.ToProductResponse(productResult)
+		return helper.ToProductResponse(productResult)
+	} else {
+		productResult := service.ProductRepo.Update(ctx, tx, product)
+
+		images := []domain.ProductImage{}
+
+		for _, req := range request.Image {
+
+			image := domain.ProductImage{}
+
+			image.ProductId = productResult.Id
+			image.ImageUrl = req
+
+			images = append(images, image)
+
+		}
+
+		var imagesResponses []string
+		imagesReponse := service.ProductRepo.SaveImage(ctx, tx, images)
+
+		for _, image := range imagesReponse {
+			imagesResponses = append(imagesResponses, image.ImageUrl)
+		}
+
+		productResult, err = service.ProductRepo.FindById(ctx, tx, productResult.ProductId)
+		helper.PanicIfError(err)
+
+		productResult.Image = imagesResponses
+
+		return helper.ToProductResponse(productResult)
+	}
 }
 
 func (service *ProductServiceImpl) Delete(ctx context.Context, productId string) {
@@ -122,6 +187,16 @@ func (service *ProductServiceImpl) FindById(ctx context.Context, productId strin
 		panic(exception.NewInterfaceError(err.Error()))
 	}
 
+	var images []string
+
+	imageResponse := service.ProductRepo.FindProductImages(ctx, tx, product.Id)
+
+	for _, image := range imageResponse {
+		images = append(images, image.ImageUrl)
+	}
+
+	product.Image = images
+
 	return helper.ToProductResponse(product)
 }
 
@@ -130,10 +205,12 @@ func (service *ProductServiceImpl) FindAll(ctx context.Context) []web.ProductRes
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	products := service.ProductRepo.FindAll(ctx, tx)
+	// var products []domain.Product
+
+	productsResponse := service.ProductRepo.FindAll(ctx, tx)
 	helper.PanicIfError(err)
 
-	return helper.ToProductResponses(products)
+	return helper.ToProductResponses(productsResponse)
 }
 
 func (service *ProductServiceImpl) CreateMany(ctx context.Context, request []web.ProductCreateReq) []web.ProductResponse {
@@ -146,7 +223,7 @@ func (service *ProductServiceImpl) CreateMany(ctx context.Context, request []web
 	for _, req := range request {
 
 		product := domain.Product{}
-		imageString := mysql.NewNullString(req.Image)
+		// imageString := mysql.NewNullString(req.Image)
 
 		category, err := service.CategoryRepo.FindById(ctx, tx, req.CategoryId)
 		if err != nil {
@@ -157,7 +234,7 @@ func (service *ProductServiceImpl) CreateMany(ctx context.Context, request []web
 		product.Price = req.Price
 		product.Quantity = req.Quantity
 		product.Description = req.Description
-		product.Image = imageString
+		product.Image = req.Image
 		product.Category.CategoryId = category.CategoryId
 		product.CreatedAt = time.Now().UnixMilli()
 

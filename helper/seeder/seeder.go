@@ -70,13 +70,13 @@ func ProductCreateMany(request []web.ProductCreateReq) []domain.Product {
 
 	for _, req := range request {
 		product := domain.Product{}
-		imageString := mysql.NewNullString(req.Image)
+		// imageString := mysql.NewNullString(req.Image)
 
 		product.Name = req.Name
 		product.Price = req.Price
 		product.Quantity = req.Quantity
 		product.Description = req.Description
-		product.Image = imageString
+		product.Image = req.Image
 		product.Category.CategoryId = req.CategoryId
 		product.CreatedAt = time.Now().UnixMilli()
 
