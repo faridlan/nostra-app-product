@@ -114,7 +114,7 @@ func (controller *AuthControllerImpl) UploadIamge(writer http.ResponseWriter, re
 
 	file := multipart.MultipartForm("userImage", request)
 
-	uploadResponse := controller.Upload.Upload(file, "users")
+	uploadResponse := controller.Upload.Upload(file, "nostra-app/users")
 
 	webResponse := web.WebResponse{
 		Code:   200,
