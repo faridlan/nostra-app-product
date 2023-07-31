@@ -117,7 +117,7 @@ func (controller *ProductControllerImpl) UploadImage(writer http.ResponseWriter,
 	file := multipart.MultipartForm("productImage", request)
 	defer file.Close()
 
-	upload := controller.UploadService.Upload(file, "products")
+	upload := controller.UploadService.Upload(file, "nostra-app/products")
 	webResponse := web.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
@@ -148,7 +148,7 @@ func (controller *ProductControllerImpl) UploadImageBatch(writer http.ResponseWr
 
 		defer file.Close()
 
-		url := controller.UploadService.Upload(file, "products")
+		url := controller.UploadService.Upload(file, "nostra-app/products")
 
 		uploads = append(uploads, url)
 	}
