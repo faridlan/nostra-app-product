@@ -300,7 +300,7 @@ func (repository *ProductRepositoryImpl) SaveImage(ctx context.Context, tx *sql.
 
 }
 
-func (repository *ProductRepositoryImpl) DeleteImage(ctx context.Context, tx *sql.Tx, products domain.Product, product domain.Product) {
+func (repository *ProductRepositoryImpl) DeleteImage(ctx context.Context, tx *sql.Tx) {
 
 	SQL := "DELETE FROM product_images"
 	_, err := tx.ExecContext(ctx, SQL)

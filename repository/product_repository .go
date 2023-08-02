@@ -16,7 +16,7 @@ type ProductRepository interface {
 	FindId(ctx context.Context, tx *sql.Tx, productId int) (domain.Product, error)
 	FindProductImages(ctx context.Context, tx *sql.Tx, productId int) []domain.ProductImage
 	SaveImage(ctx context.Context, tx *sql.Tx, products []domain.ProductImage) []domain.ProductImage
-	DeleteImage(ctx context.Context, tx *sql.Tx, products, product domain.Product)
+	DeleteImage(ctx context.Context, tx *sql.Tx)
 	SaveMany(ctx context.Context, tx *sql.Tx, products []domain.Product) []domain.Product
 	DeleteAll(ctx context.Context, tx *sql.Tx)
 }

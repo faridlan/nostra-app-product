@@ -42,6 +42,7 @@ func (service *SeederServiceImpl) Delete(ctx context.Context) {
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	service.ProductRepo.DeleteImage(ctx, tx)
 	service.UserRepo.DeleteAll(ctx, tx)
 	service.RoleRepo.DeleteAll(ctx, tx)
 	service.ProductRepo.DeleteAll(ctx, tx)
