@@ -78,5 +78,10 @@ func (service *SeederServiceImpl) SaveMany(ctx context.Context, roles []web.Role
 		domainProduct = append(domainProduct, product)
 	}
 
-	service.ProductRepo.SaveMany(ctx, tx, seeder.ProductCreateMany(domainProduct))
+	productsResult := service.ProductRepo.SaveMany(ctx, tx, seeder.ProductCreateMany(domainProduct))
+
+	// fmt.Println(productsResult)
+
+	service.ProductRepo.SaveImage(ctx, tx, seeder.ProductImageCreate(productsResult))
+
 }

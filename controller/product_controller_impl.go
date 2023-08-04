@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/faridlan/nostra-api-product/exception"
@@ -44,8 +43,6 @@ func (controller *ProductControllerImpl) CreateMany(writer http.ResponseWriter, 
 	helper.ReadFromRequestBody(request, &productsCreate)
 
 	products := controller.ProductService.CreateMany(request.Context(), productsCreate)
-
-	log.Println(products)
 
 	webResponse := web.WebResponse{
 		Code:   http.StatusOK,

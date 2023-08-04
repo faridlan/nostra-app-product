@@ -1,6 +1,7 @@
 package web
 
 type ProductCreateReq struct {
+	Id          int      `json:"id,omitempty"`
 	ProductId   string   `json:"product_id,omitempty"`
 	Name        string   `json:"name,omitempty" validate:"required,gte=5"`
 	Price       int      `json:"price,omitempty" validate:"required"`

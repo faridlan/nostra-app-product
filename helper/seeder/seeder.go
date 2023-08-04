@@ -86,3 +86,21 @@ func ProductCreateMany(request []web.ProductCreateReq) []domain.Product {
 	return products
 
 }
+
+func ProductImageCreate(request []domain.Product) []domain.ProductImage {
+	images := []domain.ProductImage{}
+
+	for _, req := range request {
+
+		for _, x := range req.Image {
+			image := domain.ProductImage{}
+			image.ProductId = req.Id
+			image.ImageUrl = x
+
+			images = append(images, image)
+		}
+
+	}
+
+	return images
+}

@@ -239,11 +239,41 @@ func (service *ProductServiceImpl) CreateMany(ctx context.Context, request []web
 		product.CreatedAt = time.Now().UnixMilli()
 
 		products = append(products, product)
+
 	}
 
 	productResponses := service.ProductRepo.SaveMany(ctx, tx, products)
+	// imagesResponse := service.ProductRepo.SaveImage(ctx, tx, images)
 
-	return helper.ToProductResponses(productResponses)
+	//
+	productResponsesNew := []domain.Product{}
+	images := []domain.ProductImage{}
+
+	for _, product := range productResponses {
+
+		productResponse, err := service.ProductRepo.FindId(ctx, tx, product.Id)
+		helper.PanicIfError(err)
+		var imageResponses []string
+
+		if len(product.Image) != 0 {
+			for _, imageX := range product.Image {
+				image := domain.ProductImage{}
+				image.ProductId = product.Id
+				image.ImageUrl = imageX
+				images = append(images, image)
+				imageResponses = append(imageResponses, imageX)
+			}
+		}
+
+		productResponse.Image = imageResponses
+
+		productResponsesNew = append(productResponsesNew, productResponse)
+
+	}
+
+	service.ProductRepo.SaveImage(ctx, tx, images)
+
+	return helper.ToProductResponses(productResponsesNew)
 }
 
 func (service *ProductServiceImpl) DeleteAll(ctx context.Context) {

@@ -268,6 +268,8 @@ func (repository *ProductRepositoryImpl) SaveMany(ctx context.Context, tx *sql.T
 
 	defer stmt.Close()
 
+	productsNew := []domain.Product{}
+
 	for _, product := range products {
 		result, err := stmt.ExecContext(ctx, product.Name, product.Price, product.Quantity, product.Description, product.ImageSingle, product.Category.CategoryId, product.CreatedAt)
 		helper.PanicIfError(err)
@@ -276,9 +278,12 @@ func (repository *ProductRepositoryImpl) SaveMany(ctx context.Context, tx *sql.T
 		helper.PanicIfError(err)
 
 		product.Id = int(id)
+
+		productsNew = append(productsNew, product)
+
 	}
 
-	return products
+	return productsNew
 }
 
 func (repository *ProductRepositoryImpl) SaveImage(ctx context.Context, tx *sql.Tx, products []domain.ProductImage) []domain.ProductImage {

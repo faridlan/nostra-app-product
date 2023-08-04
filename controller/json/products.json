@@ -4,7 +4,7 @@
   "price" : 180000,
   "quantity": 100,
   "description": "This is Product 1",
-  "image": "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png",
+  "image": ["https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png"],
   "category_id": "209bac8ae82c11eda20f0242ac130002"
   },
   {
@@ -12,6 +12,11 @@
   "price" : 78000,
   "quantity": 1000,
   "description": "This is Product 2",
+  "image": [
+    "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png",
+    "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png",
+    "https://nostra-bucket.s3.ap-southeast-1.amazonaws.com/test/CxpexQkhhU.png"
+  ],
   "category_id": "209b72afe82c11eda20f0242ac130002"
 },
 {
