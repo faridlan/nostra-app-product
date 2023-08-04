@@ -314,7 +314,7 @@ func (repository *ProductRepositoryImpl) DeleteImage(ctx context.Context, tx *sq
 }
 
 func (repository *ProductRepositoryImpl) DeleteAll(ctx context.Context, tx *sql.Tx) {
-	SQL := "TRUNCATE products"
+	SQL := "DELETE FROM products"
 
 	_, err := tx.ExecContext(ctx, SQL)
 	helper.PanicIfError(err)
