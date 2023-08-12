@@ -22,7 +22,7 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build -t nulhakim/nostra:0.4.2 .
-          docker push nulhakim/nostra:0.4.1
+          docker push nulhakim/nostra:0.4.2
   use:
     needs: build
     runs-on: ubuntu-latest
