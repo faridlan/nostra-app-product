@@ -21,5 +21,23 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t nulhakim/nostra:0.4.1 .
+          docker build -t nulhakim/nostra:0.4.2 .
           docker push nulhakim/nostra:0.4.1
+  use:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy using ssh
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.AWS_HOSTNAME }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          port: 22
+          script: |
+            pwd
+            cd /var/www/nostracode
+            pwd

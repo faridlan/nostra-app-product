@@ -24,7 +24,9 @@ func NewUploadS3AWS() UploadS3AWS {
 }
 
 func (service *UploadS3AWSImpl) Upload(body io.Reader, directory string) web.UploadResponse {
-	helper.LoadEnv()
+	helper.GetEnvWithKey("AWS_REGION")
+	helper.GetEnvWithKey("AWS_ACCESS_KEY_ID")
+	helper.GetEnvWithKey("AWS_SECRET_ACCESS_KEY")
 
 	sess := session.Must(session.NewSession())
 

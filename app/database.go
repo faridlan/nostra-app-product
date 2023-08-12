@@ -10,7 +10,7 @@ import (
 
 func NewDatabase() *sql.DB {
 
-	helper.LoadEnv()
+	// helper.LoadEnv()
 	port := helper.GetEnvWithKey("PORT_DB")
 	host := helper.GetEnvWithKey("HOST_DB")
 	name := helper.GetEnvWithKey("NAME_DB")
