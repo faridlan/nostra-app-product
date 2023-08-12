@@ -38,6 +38,8 @@ jobs:
           key: ${{ secrets.AWS_PRIVATE_KEY }}
           port: 22
           script: |
+            docker container ls 
+            cd ~/dev/env/
             pwd
-            cd /var/www/nostracode
-            pwd
+            docker container create --name coba --network nostra-network -p 5000:8080 --env-file .env nulhakim/nostra:0.4.2
+            docker container ls
